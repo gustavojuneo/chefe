@@ -12,8 +12,6 @@ function ActiveLink({ children, href, className, ...rest }: any) {
     transition: true,
   })
 
-  console.log(customClass)
-
   return (
     <Link className={customClass} href={href} {...rest}>
       {children}

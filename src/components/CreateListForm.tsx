@@ -1,5 +1,6 @@
 'use client'
 
+import { storageListsSave } from '@/storage/storageLists'
 import { RefObject, useRef } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
@@ -19,7 +20,7 @@ export const CreateListForm = () => {
   const listRef = useRef<HTMLInputElement>(null)
 
   const handleCreateList = (data: any) => {
-    console.log(data)
+    storageListsSave(data)
   }
 
   const onAddList = (currentValue: string[], onChange: any) => {
@@ -46,7 +47,7 @@ export const CreateListForm = () => {
 
       <div>
         <Controller
-          name="list"
+          name="itens"
           control={control}
           render={({ field: { onChange, value } }) => (
             <>

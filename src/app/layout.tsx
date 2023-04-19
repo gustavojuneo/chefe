@@ -2,6 +2,7 @@ import '../styles/global.css'
 
 import { Inter } from 'next/font/google'
 import ActiveLink from '@/components/ActiveLink'
+import { Main } from './main'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -27,7 +28,7 @@ export default function RootLayout({
       <head />
       <body className="bg-[#08070B] h-screen w-screen flex justify-center">
         <div className="flex flex-col w-full h-full">
-          <main>{children}</main>
+          <Main>{children}</Main>
           <footer className="mt-auto w-full">
             <nav className="w-full bg-zinc-900">
               <ul className="flex gap-4 text-lg justify-center">
