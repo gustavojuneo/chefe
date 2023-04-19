@@ -1,8 +1,11 @@
 'use client'
 
-import { storageListsSave } from '@/storage/storageLists'
+import * as uuid from 'uuid'
+import { useLists } from '@/hooks/useLists'
 import { RefObject, useRef } from 'react'
 import { Controller, useForm } from 'react-hook-form'
+import { ListDTO } from '@/dtos/ListDTO'
+import { ListItemDTO } from '@/dtos/ListItemDTO'
 
 const getItensFromInput = (inputRef: RefObject<HTMLInputElement>) => {
   if (inputRef.current) {
@@ -15,19 +18,43 @@ const getItensFromInput = (inputRef: RefObject<HTMLInputElement>) => {
   return []
 }
 
-export const CreateListForm = () => {
-  const { register, handleSubmit, control } = useForm()
+type FormData = {
+  name: string
+  itens: ListItemDTO[]
+}
+
+export const CreateListForm = ({ handleCloseModal }: any) => {
+  const { createList } = useLists()
+  const { register, handleSubmit, control } = useForm<FormData>({
+    defaultValues: {
+      itens: [],
+    },
+  })
   const listRef = useRef<HTMLInputElement>(null)
 
   const handleCreateList = (data: any) => {
-    storageListsSave(data)
+    const newData: ListDTO = {
+      id: uuid.v4(),
+      ...data,
+    }
+    createList(newData)
+    handleCloseModal()
   }
 
-  const onAddList = (currentValue: string[], onChange: any) => {
-    const listValues = currentValue
-      ? [...currentValue, ...getItensFromInput(listRef)]
-      : getItensFromInput(listRef)
+  const onAddList = (currentValue: ListItemDTO[], onChange: any) => {
+    const values = getItensFromInput(listRef).map(
+      (value) =>
+        ({
+          id: uuid.v4(),
+          name: value,
+        } as ListItemDTO),
+    )
+
+    const listValues =
+      currentValue.length > 0 ? [...currentValue, ...values] : values
+
     if (listValues) {
+      if (listRef.current) listRef.current.value = ''
       onChange(listValues)
     }
   }
@@ -35,13 +62,13 @@ export const CreateListForm = () => {
   return (
     <form className="flex flex-col w-full gap-4" onSubmit={() => {}}>
       <div>
-        <label htmlFor="listName" className="block mb-1">
+        <label htmlFor="name" className="block mb-1">
           List name
         </label>
         <input
-          id="listName"
+          id="name"
           className="outline-none px-4 py-1 w-full rounded"
-          {...register('listName')}
+          {...register('name')}
         />
       </div>
 
@@ -67,8 +94,8 @@ export const CreateListForm = () => {
                 </button>
               </div>
               <ul className="flex flex-col gap-1 h-[100px] overflow-auto mt-2">
-                {value?.map((item: string, index: number) => (
-                  <li key={`${item}-${index}`}>{item}</li>
+                {value?.map((item) => (
+                  <li key={item.id}>{item.name}</li>
                 ))}
               </ul>
             </>

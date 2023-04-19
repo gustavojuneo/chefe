@@ -1,3 +1,4 @@
+import { ListDTO } from '@/dtos/ListDTO'
 import { LISTS_STORAGE } from './storageConfig'
 
 export const storageListsSave = (list: any) => {
@@ -6,7 +7,7 @@ export const storageListsSave = (list: any) => {
 
 export const storageListsGet = () => {
   const storage = localStorage.getItem(LISTS_STORAGE)
-  const lists: string[] = storage ? JSON.parse(storage) : []
+  const lists: ListDTO[] = storage ? JSON.parse(storage) : []
   return lists
 }
 

@@ -1,7 +1,41 @@
-import { createContext } from 'react'
+import { ListDTO } from '@/dtos/ListDTO'
+import { storageListsGet, storageListsSave } from '@/storage/storageLists'
+import { createContext, useCallback, useEffect, useState } from 'react'
 
-export const ListsContext = createContext({} as any)
+export type AuthContextDataProps = {
+  lists: ListDTO[]
+  createList: (data: ListDTO) => void
+}
 
-export const ListsProvider = ({ children }: any) => {
-  return <ListsContext.Provider value={{}}>{children}</ListsContext.Provider>
+type ProviderProps = {
+  children: React.ReactNode
+}
+
+export const ListsContext = createContext<AuthContextDataProps>(
+  {} as AuthContextDataProps,
+)
+
+export const ListsProvider = ({ children }: ProviderProps) => {
+  const [lists, setLists] = useState<ListDTO[]>([])
+
+  const createList = (data: ListDTO) => {
+    const newLists = [...lists, data]
+    setLists(newLists)
+    storageListsSave(newLists)
+  }
+
+  const loadLists = useCallback(() => {
+    const lists = storageListsGet()
+    setLists(lists)
+  }, [])
+
+  useEffect(() => {
+    loadLists()
+  }, [loadLists])
+
+  return (
+    <ListsContext.Provider value={{ lists, createList }}>
+      {children}
+    </ListsContext.Provider>
+  )
 }
