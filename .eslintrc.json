@@ -1,0 +1,6 @@
+{
+  "extends": ["next/core-web-vitals", "@uncontrol/eslint-config/react"],
+  "globals": {
+    "React": true
+  }
+}
