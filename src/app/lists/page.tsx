@@ -1,3 +1,9 @@
+import { Lists as ListsComponent } from '@/components/Lists'
+
 export default function Lists() {
-  return <h1>Hello</h1>
+  return (
+    <div className="w-full h-full">
+      <ListsComponent />
+    </div>
+  )
 }
