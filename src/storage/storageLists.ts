@@ -11,13 +11,23 @@ export const storageListsGet = () => {
   return lists
 }
 
-export const storageListRemove = () => {
-  localStorage.removeItem(LISTS_STORAGE)
+export const storageListRemove = (listId: string) => {
+  const storage = localStorage.getItem(LISTS_STORAGE)
+  const list: ListDTO[] = storage ? JSON.parse(storage) : []
+  const filteredList = list.filter((item) => item.id !== listId)
+  localStorage.setItem(LISTS_STORAGE, JSON.stringify(filteredList))
 }
 
-export const storageListsRemoveItem = (itemId: string) => {
+export const storageListsRemoveItem = (listId: string, itemId: string) => {
   const storage = localStorage.getItem(LISTS_STORAGE)
-  const list: string[] = storage ? JSON.parse(storage) : []
-  const filteredList = list.filter((item) => item !== itemId)
-  localStorage.setItem(LISTS_STORAGE, JSON.stringify(filteredList))
+  const list: ListDTO[] = storage ? JSON.parse(storage) : []
+  const currentList = list.find((item) => item.id === listId)
+  const filteredItens =
+    currentList?.itens.filter((item) => item.id !== itemId) ?? []
+  const newLists = list.map((list) => {
+    if (list.id === listId) return { ...list, itens: filteredItens }
+    return list
+  })
+
+  localStorage.setItem(LISTS_STORAGE, JSON.stringify(newLists))
 }

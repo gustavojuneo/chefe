@@ -18,21 +18,30 @@ const getItensFromInput = (inputRef: RefObject<HTMLInputElement>) => {
   return []
 }
 
-type FormData = {
+export type FormData = {
+  id?: string
   name: string
   itens: ListItemDTO[]
 }
 
-export const CreateListForm = ({ handleCloseModal }: any) => {
-  const { createList } = useLists()
+type Props = {
+  handleCloseModal: () => void
+  defaultData?: FormData
+  update?: boolean
+}
+
+export const CreateListForm = ({
+  defaultData = { itens: [], name: '' },
+  update = false,
+  handleCloseModal,
+}: Props) => {
+  const { createList, updateList } = useLists()
   const { register, handleSubmit, control } = useForm<FormData>({
-    defaultValues: {
-      itens: [],
-    },
+    defaultValues: defaultData,
   })
   const listRef = useRef<HTMLInputElement>(null)
 
-  const handleCreateList = (data: any) => {
+  const handleCreateList = (data: FormData) => {
     const newData: ListDTO = {
       id: uuid.v4(),
       ...data,
@@ -47,6 +56,7 @@ export const CreateListForm = ({ handleCloseModal }: any) => {
         ({
           id: uuid.v4(),
           name: value,
+          choosed: false,
         } as ListItemDTO),
     )
 
@@ -59,8 +69,20 @@ export const CreateListForm = ({ handleCloseModal }: any) => {
     }
   }
 
+  const handleUpdateList = (data: FormData) => {
+    if (data.id) {
+      updateList(data as ListDTO)
+      handleCloseModal()
+    }
+  }
+
   return (
-    <form className="flex flex-col w-full gap-4" onSubmit={() => {}}>
+    <form
+      className="flex flex-col w-full gap-4"
+      onSubmit={
+        update ? handleSubmit(handleUpdateList) : handleSubmit(handleCreateList)
+      }
+    >
       <div>
         <label htmlFor="name" className="block mb-1">
           List name
@@ -106,7 +128,6 @@ export const CreateListForm = ({ handleCloseModal }: any) => {
       <button
         className="px-2 py-1 bg-green-600 text-white font-bold rounded"
         type="submit"
-        onClick={handleSubmit(handleCreateList)}
       >
         Criar lista
       </button>
