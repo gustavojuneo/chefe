@@ -1,8 +1,10 @@
 'use client'
 
-import { CreateListForm } from '@/components/CreateListForm'
 import * as Dialog from '@radix-ui/react-dialog'
 import { useState } from 'react'
+import { Plus } from 'lucide-react'
+
+import { CreateListForm } from '@/components/CreateListForm'
 
 export const CreateListModal = () => {
   const [opened, setOpened] = useState(false)
@@ -14,7 +16,10 @@ export const CreateListModal = () => {
   return (
     <Dialog.Root open={opened} onOpenChange={handleToggleModal}>
       <Dialog.Trigger asChild>
-        <button className="p-2 bg-white text-black">Abrir</button>
+        <button className="p-2 bg-green-500 text-white font-medium rounded-md flex justify-center gap-2">
+          Nova lista
+          <Plus />
+        </button>
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay />
