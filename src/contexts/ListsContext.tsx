@@ -1,7 +1,6 @@
 import { ListDTO } from '@/dtos/ListDTO'
+import { api } from '@/lib/axios'
 import {
-  storageListRemove,
-  storageListsGet,
   storageListsRemoveItem,
   storageListsSave,
 } from '@/storage/storageLists'
@@ -26,10 +25,17 @@ export const ListsContext = createContext<AuthContextDataProps>(
 export const ListsProvider = ({ children }: ProviderProps) => {
   const [lists, setLists] = useState<ListDTO[]>([])
 
-  const createList = (data: ListDTO) => {
-    const newLists = [...lists, data]
+  const createList = async (data: ListDTO) => {
+    const response = await api.post('/lists', { data })
+    const { list } = response.data
+    const formattedList: ListDTO = {
+      id: list.id,
+      name: list.name,
+      itens: list.listItems,
+    }
+
+    const newLists = [...lists, formattedList]
     setLists(newLists)
-    storageListsSave(newLists)
   }
 
   const updateList = (data: ListDTO) => {
@@ -42,10 +48,10 @@ export const ListsProvider = ({ children }: ProviderProps) => {
     storageListsSave(newLists)
   }
 
-  const removeList = (listId: string) => {
+  const removeList = async (listId: string) => {
     const newLists = lists.filter((list) => list.id !== listId)
+    await api.delete(`/lists/${listId}`)
     setLists(newLists)
-    storageListRemove(listId)
   }
 
   const removeItemFromList = (listId: string, itemId: string) => {
@@ -59,8 +65,10 @@ export const ListsProvider = ({ children }: ProviderProps) => {
     storageListsRemoveItem(listId, itemId)
   }
 
-  const loadLists = useCallback(() => {
-    const lists = storageListsGet()
+  const loadLists = useCallback(async () => {
+    const response = await api.get('/lists')
+    const { lists } = response.data
+
     setLists(lists)
   }, [])
 

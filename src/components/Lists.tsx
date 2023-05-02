@@ -56,8 +56,8 @@ export const Lists = () => {
           defaultValue={lists[0]?.id}
           className="w-full bg-zinc-200 rounded-md overflow-hidden"
         >
-          {lists.map((list) => (
-            <Accordion.Item key={list.id} value={list.id}>
+          {lists?.map((list) => (
+            <Accordion.Item key={list.id} value={list.id!}>
               <Accordion.Trigger className="w-full flex justify-between group  p-3 bg-red-400 text-zinc-100 font-medium">
                 {list.name}
                 <ChevronDown className="transform group-radix-state-open:rotate-180 transition duration-300" />
@@ -67,7 +67,7 @@ export const Lists = () => {
                   <CreateListModal defaultData={list} update />
                   <button
                     className="ml-auto flex gap-2 p-2 text-sm transition items-center bg-red-500 hover:bg-red-600 rounded text-zinc-100"
-                    onClick={() => handleRemoveList(list.id)}
+                    onClick={() => handleRemoveList(list.id!)}
                   >
                     <Trash size={18} />
                     Excluir Lista
@@ -75,7 +75,7 @@ export const Lists = () => {
                 </div>
                 <div className="px-4 pt-6 pb-14 ">
                   <ul className="flex flex-col gap-2 divide-y max-h-[200px] overflow-auto">
-                    {list.itens.map((item) => (
+                    {list?.itens?.map((item) => (
                       <li
                         key={item.id}
                         className="first:pt-0 pt-2 text-zinc-800 flex justify-between items-center"
@@ -84,7 +84,7 @@ export const Lists = () => {
                         <button
                           className="bg-red-500 hover:bg-red-600 transition p-2 text-zinc-100 rounded"
                           onClick={() =>
-                            handleRemoveItemFromList(list.id, item.id)
+                            handleRemoveItemFromList(list.id!, item.id)
                           }
                         >
                           <Trash size={18} />
@@ -104,7 +104,7 @@ export const Lists = () => {
                         Escolhido:
                       </span>
                       <h1 className="text-zinc-800 text-xl font-bold">
-                        {getChoosedItem(choosedItens, list.id)?.item.name ??
+                        {getChoosedItem(choosedItens, list.id!)?.item.name ??
                           'Sorteio não realizado'}
                       </h1>
                     </div>

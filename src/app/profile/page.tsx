@@ -1,46 +1,47 @@
 'use client'
-import { signIn, signOut, useSession } from 'next-auth/react'
+import { SignInWithFacebook } from '@/components/SignInWithFacebookButton'
+import { SignInWithGoogleButton } from '@/components/SignInWithGoogleButton'
+import { signOut, useSession } from 'next-auth/react'
+import { LogOut } from 'lucide-react'
+import Image from 'next/image'
 
 export default function Profile() {
   const { data: session } = useSession()
-
-  const handleConnectWithGoogle = async () => {
-    await signIn('google')
-  }
-
-  const handleConnectWithFacebook = async () => {
-    await signIn('facebook')
-  }
 
   const handleLogout = async () => {
     await signOut()
   }
 
   return (
-    <div>
-      <h1>Hello</h1>
-      <button
-        className="bg-green-500 p-2 text-white"
-        onClick={handleConnectWithGoogle}
-      >
-        Conectar com Google
-      </button>
-      <button
-        className="bg-blue-500 p-2 text-white ml-2"
-        onClick={handleConnectWithFacebook}
-      >
-        Conectar com Facebook
-      </button>
-      <h2 className="text-black text-lg">
-        Usuario logado: {session?.user?.name}
-      </h2>
-
-      <button
-        className="bg-green-500 p-2 text-white mt-20"
-        onClick={handleLogout}
-      >
-        Deslogar
-      </button>
+    <div className="w-full h-full flex flex-col justify-center">
+      <div className="flex flex-col justify-center gap-2">
+        {session?.user ? (
+          <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center gap-2">
+              <Image
+                src={session?.user?.image ?? ''}
+                alt={session?.user?.name ?? ''}
+                width={50}
+                height={50}
+                className="rounded-full"
+              />
+              <h1 className="text-zinc-800 text-2xl">{session?.user?.name}</h1>
+            </div>
+            <button
+              className="mt-20 flex gap-2 items-center text-zinc-800"
+              onClick={handleLogout}
+            >
+              <LogOut />
+              Deslogar
+            </button>
+          </div>
+        ) : (
+          <>
+            <SignInWithGoogleButton />
+            <SignInWithFacebook />
+          </>
+        )}
+      </div>
     </div>
   )
 }
