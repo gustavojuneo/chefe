@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 import NextAuth from 'next-auth/next'
 
 declare module 'next-auth' {
@@ -8,7 +9,7 @@ declare module 'next-auth' {
     image: string
   }
 
-  interface Session {
+  export interface Session {
     user: User
   }
 }

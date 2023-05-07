@@ -1,15 +1,49 @@
 import { prismaClient } from '@/lib/prisma'
 import { NextResponse } from 'next/server'
 import { ListItemDTO } from '@/dtos/ListItemDTO'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '../../auth/[...nextauth]/route'
 
 export async function DELETE(req: Request, { params }: any) {
+  const session = await getServerSession(authOptions)
   const id = params.id
 
-  await prismaClient.list.delete({
-    where: {
-      id,
-    },
+  if (!session) {
+    return NextResponse.json(
+      { message: 'É Necessário estar logado' },
+      { status: 400 },
+    )
+  }
+
+  const list = await prismaClient.list.findFirst({
+    where: { id },
+    include: { members: true },
   })
+
+  const isMember = list?.members
+    .map((member) => member.userId)
+    .includes(session.user.id)
+
+  if (list?.userId !== session.user.id && !isMember) {
+    return NextResponse.json({ message: 'Operação inválida' }, { status: 400 })
+  }
+
+  if (isMember) {
+    await prismaClient.membersOnLists.delete({
+      where: {
+        userId_listId: {
+          listId: id,
+          userId: session.user.id,
+        },
+      },
+    })
+  } else {
+    await prismaClient.list.delete({
+      where: {
+        id,
+      },
+    })
+  }
 
   return NextResponse.json({
     data: id,
@@ -34,7 +68,7 @@ export async function PUT(req: Request, { params }: any) {
     data: {
       name: data.name,
       updated_at: new Date(),
-      listItems: {
+      itens: {
         connectOrCreate: data.itens.map((item: ListItemDTO) => ({
           where: {
             id: item.id,

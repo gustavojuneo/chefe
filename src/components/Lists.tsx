@@ -3,7 +3,7 @@
 import clsx from 'clsx'
 import { useState } from 'react'
 import * as Accordion from '@radix-ui/react-accordion'
-import { ChevronDown, Trash } from 'lucide-react'
+import { ChevronDown, Share, Trash } from 'lucide-react'
 
 import { ListDTO } from '@/dtos/ListDTO'
 import { ListItemDTO } from '@/dtos/ListItemDTO'
@@ -35,7 +35,7 @@ export const Lists = () => {
       const filteredItem = choosedItens.filter(
         (item) => item.listId !== list.id,
       )
-      setChoosedItens([...filteredItem, { item, listId: list.id }])
+      setChoosedItens([...filteredItem, { item, listId: list.id! }])
     }
   }
 
@@ -45,6 +45,11 @@ export const Lists = () => {
 
   const handleRemoveItemFromList = (listId: string, itemId: string) => {
     removeItemFromList(listId, itemId)
+  }
+
+  const handleShareList = (listId?: string) => {
+    const shareLink = `https://chefe.gustavojuneo.dev/lists/${listId}/invite`
+    navigator.clipboard.writeText(shareLink)
   }
 
   return (
@@ -64,6 +69,12 @@ export const Lists = () => {
               </Accordion.Trigger>
               <Accordion.Content className={accordionContentClass}>
                 <div className="flex gap-2 p-2 mt-1">
+                  <button
+                    className="p-2 flex bg-blue-400 hover:bg-blue-700 text-white rounded transition"
+                    onClick={() => handleShareList(list.id)}
+                  >
+                    <Share size={22} />
+                  </button>
                   <CreateListModal defaultData={list} update />
                   <button
                     className="ml-auto flex gap-2 p-2 text-sm transition items-center bg-red-500 hover:bg-red-600 rounded text-zinc-100"

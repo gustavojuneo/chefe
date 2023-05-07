@@ -1,5 +1,4 @@
-// import { prismaClient } from '@/lib/prisma'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
 import { NextResponse } from 'next/server'
 import { authOptions } from '../auth/[...nextauth]/route'
 import { ListItemDTO } from '@/dtos/ListItemDTO'
@@ -8,12 +7,29 @@ import { prismaClient } from '@/lib/prisma'
 export async function GET() {
   const session = await getServerSession(authOptions)
 
+  if (!session) {
+    return NextResponse.json(
+      { message: 'É necessário estar logado.' },
+      { status: 400 },
+    )
+  }
+
   const lists = await prismaClient.list.findMany({
-    where: {
-      userId: session?.user?.id,
-    },
     include: {
       itens: true,
+      members: true,
+    },
+    where: {
+      OR: [
+        { userId: session.user.id },
+        {
+          members: {
+            some: {
+              userId: session.user.id,
+            },
+          },
+        },
+      ],
     },
   })
 
