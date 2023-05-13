@@ -1,9 +1,10 @@
-import { prismaClient } from '@/lib/prisma'
-import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
+import { NextResponse } from 'next/server'
+
+import { prismaClient } from '@/lib/prisma'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 
-export async function DELETE(req: Request, { params }: any) {
+export async function PATCH(req: Request, { params }: any) {
   const session = await getServerSession(authOptions)
   const { id, itemId } = params
 
@@ -31,7 +32,10 @@ export async function DELETE(req: Request, { params }: any) {
     where: { id },
     data: {
       itens: {
-        delete: { id: itemId },
+        update: {
+          where: { id: itemId },
+          data: { choosed: true },
+        },
       },
     },
   })

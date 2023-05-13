@@ -18,7 +18,7 @@ export async function PATCH(req: Request, { params }: any) {
   const list = await prismaClient.list.findFirst({
     where: {
       OR: [
-        { id, userId: session.user.id },
+        { id, ownerId: session.user.id },
         {
           AND: [
             { id },

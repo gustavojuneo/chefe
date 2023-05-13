@@ -21,7 +21,7 @@ export async function GET() {
     },
     where: {
       OR: [
-        { userId: session.user.id },
+        { ownerId: session.user.id },
         {
           members: {
             some: {
@@ -64,7 +64,7 @@ export async function POST(req: Request) {
   const list = await prismaClient.list.create({
     data: {
       name: data.name,
-      userId: session?.user?.id ?? '',
+      ownerId: session?.user?.id ?? '',
       itens: {
         createMany: {
           data: data.itens.map((item: ListItemDTO) => ({

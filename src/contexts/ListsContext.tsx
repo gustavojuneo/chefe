@@ -1,13 +1,22 @@
 import { ListDTO } from '@/dtos/ListDTO'
+import { ListItemDTO } from '@/dtos/ListItemDTO'
 import { api } from '@/lib/axios'
 import { createContext, useCallback, useEffect, useState } from 'react'
+
+type LastChoosedItem = {
+  listId: string
+  item: ListItemDTO
+}
 
 export type AuthContextDataProps = {
   lists: ListDTO[]
   createList: (data: ListDTO) => void
   updateList: (data: ListDTO) => void
+  getRandomItemFromList: (list: ListDTO, all?: boolean) => void
   removeList: (listId: string) => void
   removeItemFromList: (listId: string, itemId: string) => void
+  lastChoosedItem: LastChoosedItem | null
+  hasItensToChoose: (listId: string) => boolean
 }
 
 type ProviderProps = {
@@ -20,6 +29,13 @@ export const ListsContext = createContext<AuthContextDataProps>(
 
 export const ListsProvider = ({ children }: ProviderProps) => {
   const [lists, setLists] = useState<ListDTO[]>([])
+  const [lastChoosedItem, setLastChoosedItem] =
+    useState<LastChoosedItem | null>(null)
+
+  const hasItensToChoose = (listId: string) =>
+    !!lists
+      .find((list) => list.id === listId)
+      ?.itens.some((item) => !item.choosed)
 
   const createList = async (data: ListDTO) => {
     const response = await api.post('/lists', { data })
@@ -66,6 +82,38 @@ export const ListsProvider = ({ children }: ProviderProps) => {
     setLists(newLists)
   }
 
+  const getRandomItemFromList = async (list: ListDTO, all: boolean = false) => {
+    const itens = [...list?.itens]
+    if (hasItensToChoose(list.id!) || all) {
+      const filteredItens = all ? itens : itens.filter((i) => !i.choosed)
+      const random = Math.floor(Math.random() * filteredItens.length + 1)
+      const item = filteredItens.sort(() => Math.random() - 0.5)[random - 1]
+
+      if (item) {
+        if (!all) {
+          item.choosed = true
+          await api.patch(`/lists/${list.id}/item/${item.id}/chooseItem`)
+          const updatedLists = lists.map((current) =>
+            current.id === list.id
+              ? {
+                  ...current,
+                  itens: current.itens.map((i) =>
+                    i.id === item.id
+                      ? {
+                          ...item,
+                        }
+                      : { ...i },
+                  ),
+                }
+              : { ...current },
+          )
+          setLists(updatedLists)
+        }
+        setLastChoosedItem({ listId: list.id!, item })
+      }
+    }
+  }
+
   const loadLists = useCallback(async () => {
     const response = await api.get('/lists')
     const { lists } = response.data
@@ -79,7 +127,16 @@ export const ListsProvider = ({ children }: ProviderProps) => {
 
   return (
     <ListsContext.Provider
-      value={{ lists, createList, removeList, removeItemFromList, updateList }}
+      value={{
+        lists,
+        createList,
+        removeList,
+        removeItemFromList,
+        updateList,
+        getRandomItemFromList,
+        lastChoosedItem,
+        hasItensToChoose,
+      }}
     >
       {children}
     </ListsContext.Provider>

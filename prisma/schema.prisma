@@ -67,13 +67,13 @@ model List {
   name       String
   created_at DateTime  @default(now())
   updated_at DateTime? @updatedAt
-  userId     String
+  ownerId    String
 
-  user    User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  owner   User             @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   itens   ListItem[]
   members MembersOnLists[]
 
-  @@index([userId])
+  @@index([ownerId])
 }
 
 model MembersOnLists {
@@ -92,6 +92,7 @@ model MembersOnLists {
 model ListItem {
   id         String    @id @default(cuid())
   name       String
+  choosed    Boolean   @default(false)
   created_at DateTime  @default(now())
   updated_at DateTime? @updatedAt
   listId     String
