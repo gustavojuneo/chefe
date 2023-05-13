@@ -7,10 +7,11 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 export async function PATCH(req: Request, { params }: any) {
   const session = await getServerSession(authOptions)
   const id = params.id
+
   if (!session) {
     return NextResponse.json(
       { message: 'É necessário estar logado' },
-      { status: 400 },
+      { status: 401 },
     )
   }
 

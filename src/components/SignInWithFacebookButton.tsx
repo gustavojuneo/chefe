@@ -11,7 +11,7 @@ export function SignInWithFacebook() {
 
   return (
     <button
-      className="flex justify-center items-center gap-2 rounded border-black border-2 py-2 px-3"
+      className="flex justify-center items-center gap-2 rounded font-bold border-black border-[3px] py-2 px-3"
       onClick={handleSignIn}
     >
       <Image

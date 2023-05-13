@@ -1,9 +1,14 @@
-import { CreateListModal } from '@/components/CreateListModal'
+import { getServerSession } from 'next-auth/next'
 
-export default function Home() {
-  return (
-    <div className="w-full h-full flex flex-col items-center justify-center">
-      <CreateListModal />
-    </div>
-  )
+import { authOptions } from './api/auth/[...nextauth]/route'
+import { redirect } from 'next/navigation'
+
+export default async function Home() {
+  const session = await getServerSession(authOptions)
+
+  if (session) {
+    redirect('/app')
+  } else {
+    redirect('/sign-in')
+  }
 }
