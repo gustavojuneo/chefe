@@ -11,8 +11,8 @@ export async function DELETE(req: Request, { params }: any) {
 
   if (!session) {
     return NextResponse.json(
-      { message: 'É Necessário estar logado' },
-      { status: 400 },
+      { message: 'É necessário estar logado.' },
+      { status: 401 },
     )
   }
 
@@ -57,11 +57,32 @@ interface PutBody {
 }
 
 export async function PUT(req: Request, { params }: any) {
+  const session = await getServerSession(authOptions)
   const res = await req.json()
   const id = params.id
   const { data } = res as PutBody
 
-  const list = await prismaClient.list.update({
+  if (!session) {
+    return NextResponse.json(
+      { message: 'É necessário estar logado.' },
+      { status: 401 },
+    )
+  }
+
+  const list = await prismaClient.list.findFirst({
+    where: { id },
+    include: { members: true },
+  })
+
+  const isMember = list?.members
+    .map((member) => member.userId)
+    .includes(session.user.id)
+
+  if (list?.userId !== session.user.id && !isMember) {
+    return NextResponse.json({ message: 'Operação inválida' }, { status: 400 })
+  }
+
+  const updatedList = await prismaClient.list.update({
     where: { id },
     include: { itens: true },
     data: {
@@ -78,7 +99,7 @@ export async function PUT(req: Request, { params }: any) {
   })
 
   return NextResponse.json(
-    { list },
+    { list: updatedList },
     {
       status: 201,
     },

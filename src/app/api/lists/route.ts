@@ -10,7 +10,7 @@ export async function GET() {
   if (!session) {
     return NextResponse.json(
       { message: 'É necessário estar logado.' },
-      { status: 400 },
+      { status: 401 },
     )
   }
 
@@ -45,9 +45,14 @@ export async function POST(req: Request) {
   const res = await req.json()
   const session = await getServerSession(authOptions)
 
-  console.log(res)
-
   const { data } = res
+
+  if (!session) {
+    return NextResponse.json(
+      { message: 'É necessário estar logado.' },
+      { status: 401 },
+    )
+  }
 
   if (!data.name) {
     return NextResponse.json(

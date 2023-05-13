@@ -7,13 +7,10 @@ export async function DELETE(req: Request, { params }: any) {
   const session = await getServerSession(authOptions)
   const { id, itemId } = params
 
-  console.log('id >>>', id)
-  console.log('item id >>>', itemId)
-
   if (!session) {
     return NextResponse.json(
       { message: 'É Necessário estar logado' },
-      { status: 400 },
+      { status: 401 },
     )
   }
 
