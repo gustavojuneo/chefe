@@ -19,7 +19,7 @@ export default async function SignIn({ searchParams }: PageProps) {
     if (callbackUrl) {
       redirect(callbackUrl)
     } else {
-      redirect('/app')
+      redirect('/application')
     }
   }
 

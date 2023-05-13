@@ -26,7 +26,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <li className="pt-3 pb-6">
                 <ActiveLink
                   className="text-zinc-700 flex flex-col items-center"
-                  href="/app"
+                  href="/application"
                 >
                   <Home size={24} />
                   Home
@@ -35,7 +35,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <li className="pt-3 pb-6">
                 <ActiveLink
                   className="text-zinc-700 flex flex-col items-center"
-                  href="/app/lists"
+                  href="/application/lists"
                 >
                   <List size={24} />
                   Lists
@@ -44,7 +44,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <li className="pt-3 pb-6">
                 <ActiveLink
                   className="text-zinc-700 flex flex-col items-center"
-                  href="/app/profile"
+                  href="/application/profile"
                 >
                   <User size={24} />
                   Profile
