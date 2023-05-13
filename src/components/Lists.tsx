@@ -51,7 +51,7 @@ export const Lists = () => {
   }
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center px-8">
+    <div className="w-full flex flex-1 flex-col items-center justify-center px-8">
       <ul className="w-full flex flex-col gap-2 items-center">
         <Accordion.Root
           type="single"

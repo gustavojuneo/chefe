@@ -18,8 +18,8 @@ export default function Profile() {
             <Image
               src={session?.user?.image ?? ''}
               alt={session?.user?.name ?? ''}
-              width={50}
-              height={50}
+              width={100}
+              height={100}
               className="rounded-full"
             />
             <h1 className="text-zinc-800 text-2xl">{session?.user?.name}</h1>
