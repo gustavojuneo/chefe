@@ -1,10 +1,12 @@
 'use client'
-import { Lists as ListsComponent } from '@/components/Lists'
-import { api } from '@/lib/axios'
+import 'react-toastify/dist/ReactToastify.css'
 import { isAxiosError } from 'axios'
 import { useCallback, useEffect } from 'react'
 import { ToastContainer, toast } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
+import { redirect } from 'next/navigation'
+
+import { Lists as ListsComponent } from '@/components/Lists'
+import { api } from '@/lib/axios'
 
 interface PageProps {
   params: {
@@ -21,6 +23,9 @@ export default function Invite({ params }: PageProps) {
         closeOnClick: true,
         theme: 'colored',
       })
+      setTimeout(() => {
+        redirect('/application/lists')
+      }, 1000);
     } catch (err) {
       if (isAxiosError(err)) {
         toast.error(err?.response?.data.message, {
