@@ -1,10 +1,5 @@
 import { ListDTO } from '@/dtos/ListDTO'
-import {
-  storageListRemove,
-  storageListsGet,
-  storageListsRemoveItem,
-  storageListsSave,
-} from '@/storage/storageLists'
+import { api } from '@/lib/axios'
 import { createContext, useCallback, useEffect, useState } from 'react'
 
 export type AuthContextDataProps = {
@@ -26,29 +21,42 @@ export const ListsContext = createContext<AuthContextDataProps>(
 export const ListsProvider = ({ children }: ProviderProps) => {
   const [lists, setLists] = useState<ListDTO[]>([])
 
-  const createList = (data: ListDTO) => {
-    const newLists = [...lists, data]
+  const createList = async (data: ListDTO) => {
+    const response = await api.post('/lists', { data })
+    const { list } = response.data
+    const formattedList: ListDTO = {
+      id: list.id,
+      name: list.name,
+      itens: list.itens,
+    }
+
+    const newLists = [...lists, formattedList]
     setLists(newLists)
-    storageListsSave(newLists)
   }
 
-  const updateList = (data: ListDTO) => {
-    const newLists = lists.map((list) => {
-      if (list.id === data.id) return data
-      return list
-    })
+  const updateList = async (data: ListDTO) => {
+    const response = await api.put(`/lists/${data.id}`, { data })
+    const { list } = response.data
+    const formattedList: ListDTO = {
+      id: list.id,
+      name: list.name,
+      itens: list.itens,
+    }
+    const newLists = lists.map((item) =>
+      item.id === formattedList.id ? { ...formattedList } : { ...item },
+    )
 
     setLists(newLists)
-    storageListsSave(newLists)
   }
 
-  const removeList = (listId: string) => {
+  const removeList = async (listId: string) => {
     const newLists = lists.filter((list) => list.id !== listId)
+    await api.delete(`/lists/${listId}`)
     setLists(newLists)
-    storageListRemove(listId)
   }
 
-  const removeItemFromList = (listId: string, itemId: string) => {
+  const removeItemFromList = async (listId: string, itemId: string) => {
+    await api.delete(`/lists/${listId}/item/${itemId}`)
     const list = lists.find((list) => list.id === listId)
     const filteredItens = list?.itens.filter((item) => item.id !== itemId) ?? []
     const newLists = lists.map((list) => {
@@ -56,11 +64,12 @@ export const ListsProvider = ({ children }: ProviderProps) => {
       return list
     })
     setLists(newLists)
-    storageListsRemoveItem(listId, itemId)
   }
 
-  const loadLists = useCallback(() => {
-    const lists = storageListsGet()
+  const loadLists = useCallback(async () => {
+    const response = await api.get('/lists')
+    const { lists } = response.data
+
     setLists(lists)
   }, [])
 

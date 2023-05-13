@@ -1,7 +1,7 @@
 import { ListItemDTO } from './ListItemDTO'
 
 export type ListDTO = {
-  id: string
+  id?: string
   name: string
   itens: ListItemDTO[]
 }

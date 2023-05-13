@@ -1,5 +1,4 @@
 'use client'
-
 import * as uuid from 'uuid'
 import { useLists } from '@/hooks/useLists'
 import { RefObject, useRef } from 'react'
@@ -43,7 +42,6 @@ export const CreateListForm = ({
 
   const handleCreateList = (data: FormData) => {
     const newData: ListDTO = {
-      id: uuid.v4(),
       ...data,
     }
     createList(newData)
@@ -54,7 +52,6 @@ export const CreateListForm = ({
     const values = getItensFromInput(listRef).map(
       (value) =>
         ({
-          id: uuid.v4(),
           name: value,
           choosed: false,
         } as ListItemDTO),
@@ -117,7 +114,7 @@ export const CreateListForm = ({
               </div>
               <ul className="flex flex-col gap-1 h-[100px] overflow-auto mt-2">
                 {value?.map((item) => (
-                  <li key={item.id}>{item.name}</li>
+                  <li key={item.id ?? uuid.v4()}>{item.name}</li>
                 ))}
               </ul>
             </>

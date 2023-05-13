@@ -1,5 +1,5 @@
 export type ListItemDTO = {
-  id: string
+  id?: string
   name: string
   choosed?: boolean
 }
