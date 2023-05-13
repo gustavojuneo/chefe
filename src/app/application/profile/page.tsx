@@ -12,7 +12,7 @@ export default function Profile() {
 
   return (
     <div className="w-full h-full flex flex-col justify-center">
-      <div className="flex flex-col justify-center gap-2">
+      <div className="flex flex-col justify-center gap-2 h-full">
         <div className="flex flex-col items-center">
           <div className="flex flex-col items-center gap-2">
             <Image
@@ -33,6 +33,24 @@ export default function Profile() {
           </button>
         </div>
       </div>
+      <span className="text-center">
+        Feito com ❤️ por{' '}
+        <strong>
+          <a href="https://gustavojuneo.dev" target="_blank" rel="noreferrer">
+            Gustavo
+          </a>
+        </strong>{' '}
+        e{' '}
+        <strong>
+          <a
+            target="_blank"
+            href="https://www.linkedin.com/in/anna-serrasantos/"
+            rel="noreferrer"
+          >
+            Anna
+          </a>
+        </strong>
+      </span>
     </div>
   )
 }
