@@ -4,7 +4,11 @@ const nextConfig = {
     appDir: true,
   },
   images: {
-    domains: ['lh3.googleusercontent.com', 'platform-lookaside.fbsbx.com'],
+    domains: [
+      'lh3.googleusercontent.com',
+      'platform-lookaside.fbsbx.com',
+      'upload.wikimedia.org',
+    ],
   },
 }
 

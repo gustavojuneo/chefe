@@ -5,7 +5,9 @@ export default async function Lists() {
   return (
     <div className="flex flex-col w-full h-full">
       <Header />
-      <ListsComponent />
+      <div className="w-full h-full flex flex-col mt-10">
+        <ListsComponent />
+      </div>
     </div>
   )
 }
