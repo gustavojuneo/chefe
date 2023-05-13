@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { ListItemDTO } from '@/dtos/ListItemDTO'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../../auth/[...nextauth]/route'
+import { ListDTO } from '@/dtos/ListDTO'
 
 export async function DELETE(req: Request, { params }: any) {
   const session = await getServerSession(authOptions)
@@ -51,32 +52,27 @@ export async function DELETE(req: Request, { params }: any) {
   })
 }
 
+interface PutBody {
+  data: ListDTO
+}
+
 export async function PUT(req: Request, { params }: any) {
   const res = await req.json()
   const id = params.id
-  const { data } = res
-
-  if (!data.name) {
-    return NextResponse.json(
-      { message: 'Erro ao criar lista, o nome é obrigatório' },
-      { status: 400 },
-    )
-  }
+  const { data } = res as PutBody
 
   const list = await prismaClient.list.update({
     where: { id },
+    include: { itens: true },
     data: {
-      name: data.name,
+      name: data?.name,
       updated_at: new Date(),
       itens: {
-        connectOrCreate: data.itens.map((item: ListItemDTO) => ({
-          where: {
-            id: item.id,
-          },
-          create: {
-            name: item.name,
-          },
-        })),
+        createMany: {
+          data: data?.itens
+            ?.filter((item: ListItemDTO) => !item.id)
+            .map((item: ListItemDTO) => ({ name: item.name })),
+        },
       },
     },
   })

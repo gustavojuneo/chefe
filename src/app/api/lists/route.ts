@@ -45,6 +45,8 @@ export async function POST(req: Request) {
   const res = await req.json()
   const session = await getServerSession(authOptions)
 
+  console.log(res)
+
   const { data } = res
 
   if (!data.name) {
