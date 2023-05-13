@@ -10,28 +10,48 @@ export async function PATCH(req: Request, { params }: any) {
 
   if (!session) {
     return NextResponse.json(
-      { message: 'É necessário estar logado' },
+      { message: 'É necessário estar logado.' },
       { status: 401 },
     )
   }
 
-  const memberOnList = await prismaClient.membersOnLists.findFirst({
+  const list = await prismaClient.list.findFirst({
     where: {
-      userId: session.user.id,
+      OR: [
+        { id, userId: session.user.id },
+        {
+          AND: [
+            { id },
+            {
+              members: {
+                some: {
+                  userId: session.user.id,
+                },
+              },
+            },
+          ],
+        },
+      ],
     },
   })
 
-  if (memberOnList) {
+  if (list) {
     return NextResponse.json(
       { message: 'Usuário já esta vinculado a esta lista.' },
       { status: 400 },
     )
   }
 
-  await prismaClient.membersOnLists.create({
+  await prismaClient.list.update({
+    where: {
+      id,
+    },
     data: {
-      listId: id,
-      userId: session.user.id,
+      members: {
+        create: {
+          userId: session.user.id,
+        },
+      },
     },
   })
 
