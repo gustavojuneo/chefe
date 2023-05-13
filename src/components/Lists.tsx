@@ -94,9 +94,11 @@ export const Lists = () => {
                         {item.name}
                         <button
                           className="bg-red-500 hover:bg-red-600 transition p-2 text-zinc-100 rounded"
-                          onClick={() =>
-                            handleRemoveItemFromList(list.id!, item.id)
-                          }
+                          onClick={() => {
+                            if (item.id) {
+                              handleRemoveItemFromList(list.id!, item.id)
+                            }
+                          }}
                         >
                           <Trash size={18} />
                         </button>
