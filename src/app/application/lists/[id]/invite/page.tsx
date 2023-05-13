@@ -25,7 +25,7 @@ export default function Invite({ params }: PageProps) {
       })
       setTimeout(() => {
         redirect('/application/lists')
-      }, 1000);
+      }, 1000)
     } catch (err) {
       if (isAxiosError(err)) {
         toast.error(err?.response?.data.message, {
