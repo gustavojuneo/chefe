@@ -25,7 +25,7 @@ export async function DELETE(req: Request, { params }: any) {
     .map((member) => member.userId)
     .includes(session.user.id)
 
-  if (list?.userId !== session.user.id && !isMember) {
+  if (list?.ownerId !== session.user.id && !isMember) {
     return NextResponse.json({ message: 'Operação inválida' }, { status: 400 })
   }
 
@@ -78,7 +78,7 @@ export async function PUT(req: Request, { params }: any) {
     .map((member) => member.userId)
     .includes(session.user.id)
 
-  if (list?.userId !== session.user.id && !isMember) {
+  if (list?.ownerId !== session.user.id && !isMember) {
     return NextResponse.json({ message: 'Operação inválida' }, { status: 400 })
   }
 

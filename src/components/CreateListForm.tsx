@@ -1,4 +1,3 @@
-'use client'
 import * as uuid from 'uuid'
 import { useLists } from '@/hooks/useLists'
 import { RefObject, useRef } from 'react'
@@ -126,7 +125,7 @@ export const CreateListForm = ({
         className="px-2 py-1 bg-green-600 text-white font-bold rounded"
         type="submit"
       >
-        Criar lista
+        {update ? 'Atualizar Lista' : 'Criar lista'}
       </button>
     </form>
   )

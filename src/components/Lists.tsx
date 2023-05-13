@@ -1,26 +1,22 @@
 'use client'
 
 import clsx from 'clsx'
-import { useState } from 'react'
 import * as Accordion from '@radix-ui/react-accordion'
 import { ChevronDown, Share, Trash } from 'lucide-react'
 
 import { ListDTO } from '@/dtos/ListDTO'
-import { ListItemDTO } from '@/dtos/ListItemDTO'
 import { useLists } from '@/hooks/useLists'
 import { CreateListModal } from './CreateListModal'
 
-type ChoosedItem = {
-  item: ListItemDTO
-  listId: string
-}
-
-const getChoosedItem = (choosedItens: ChoosedItem[], listId: string) =>
-  choosedItens.find((i) => i.listId === listId)
-
 export const Lists = () => {
-  const [choosedItens, setChoosedItens] = useState<ChoosedItem[]>([])
-  const { lists, removeList, removeItemFromList } = useLists()
+  const {
+    lists,
+    removeList,
+    removeItemFromList,
+    getRandomItemFromList,
+    lastChoosedItem,
+    hasItensToChoose,
+  } = useLists()
   const accordionContentClass = clsx([
     'overflow-hidden',
     'bg-zinc-100 rounded-b-md',
@@ -28,14 +24,8 @@ export const Lists = () => {
   ])
 
   const handleGetRandomItem = (list: ListDTO) => {
-    const itens = [...list?.itens]
-    if (itens && itens.length > 0) {
-      const random = Math.floor(Math.random() * itens.length + 1)
-      const item = itens.sort(() => Math.random() - 0.5)[random - 1]
-      const filteredItem = choosedItens.filter(
-        (item) => item.listId !== list.id,
-      )
-      setChoosedItens([...filteredItem, { item, listId: list.id! }])
+    if (hasItensToChoose(list.id!)) {
+      getRandomItemFromList(list)
     }
   }
 
@@ -48,8 +38,16 @@ export const Lists = () => {
   }
 
   const handleShareList = (listId?: string) => {
-    const shareLink = `https://chefe.gustavojuneo.dev/lists/${listId}/invite`
+    const shareLink = `https://chefe.gustavojuneo.dev/application/lists/${listId}/invite`
     navigator.clipboard.writeText(shareLink)
+  }
+
+  const getListMessage = (listId: string) => {
+    if (lastChoosedItem?.item.name) return lastChoosedItem?.item.name
+    if (!hasItensToChoose(listId)) {
+      return 'Não existe itens a serem escolhidos.'
+    }
+    return 'Sorteio não realizado'
   }
 
   return (
@@ -89,7 +87,13 @@ export const Lists = () => {
                     {list?.itens?.map((item) => (
                       <li
                         key={item.id}
-                        className="first:pt-0 pt-2 text-zinc-800 flex justify-between items-center"
+                        className={clsx(
+                          'first:pt-0 pt-2 flex justify-between items-center',
+                          {
+                            'text-zinc-800': !item.choosed,
+                            'text-green-500': item.choosed,
+                          },
+                        )}
                       >
                         {item.name}
                         <button
@@ -107,19 +111,19 @@ export const Lists = () => {
                   </ul>
                   <div className="mt-10 flex flex-col items-center">
                     <button
-                      className="p-4 bg-green-500 rounded-lg hover:bg-green-300 transition text-white font-bold "
+                      className="p-4 bg-green-500 rounded-lg hover:bg-green-300 transition text-white font-bold disabled:opacity-40"
                       onClick={() => handleGetRandomItem(list)}
+                      disabled={!hasItensToChoose(list.id!)}
                     >
                       Realizar sorteio
                     </button>
-                    <div className="mt-4">
+                    <div className="mt-4 flex flex-col items-center">
                       <span className="text-zinc-800 text-sm mb-2 block">
                         Escolhido:
                       </span>
-                      <h1 className="text-zinc-800 text-xl font-bold">
-                        {getChoosedItem(choosedItens, list.id!)?.item.name ??
-                          'Sorteio não realizado'}
-                      </h1>
+                      <span className="text-zinc-800 text-xl font-bold text-center">
+                        {getListMessage(list.id!)}
+                      </span>
                     </div>
                   </div>
                 </div>
