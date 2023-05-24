@@ -68,6 +68,7 @@ model List {
   created_at DateTime  @default(now())
   updated_at DateTime? @updatedAt
   ownerId    String
+  restricted Boolean?  @default(true)
 
   owner   User             @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   itens   ListItem[]
