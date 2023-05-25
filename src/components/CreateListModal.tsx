@@ -5,13 +5,19 @@ import { useState } from 'react'
 import { Plus, Pencil } from 'lucide-react'
 
 import { CreateListForm, FormData } from '@/components/CreateListForm'
+import clsx from 'clsx'
 
 type Props = {
   defaultData?: FormData
   update?: boolean
+  isLoading?: boolean
 }
 
-export const CreateListModal = ({ defaultData, update = false }: Props) => {
+export const CreateListModal = ({
+  defaultData,
+  update = false,
+  isLoading = true,
+}: Props) => {
   const [opened, setOpened] = useState(false)
 
   const handleToggleModal = (open: boolean) => {
@@ -21,19 +27,32 @@ export const CreateListModal = ({ defaultData, update = false }: Props) => {
   return (
     <Dialog.Root open={opened} onOpenChange={handleToggleModal}>
       <Dialog.Trigger asChild>
-        <button className="p-2 bg-green-500 text-white font-medium rounded-md flex justify-center gap-2 items-center">
-          {update ? (
-            <>
-              <Pencil size={18} />
-              Atualizar
-            </>
-          ) : (
-            <>
-              Nova Lista
-              <Plus />
-            </>
-          )}
-        </button>
+        {isLoading ? (
+          <div className="animate-pulse">
+            <div
+              className={clsx(
+                'p-2 flex items-center gap-2 bg-slate-200 border-2 h-full rounded',
+              )}
+            >
+              <div className="w-[18px] h-[18px]"></div>
+              {<div className="w-14 h-[20px]" />}
+            </div>
+          </div>
+        ) : (
+          <button className="p-2 bg-green-500 text-white font-medium rounded-md flex justify-center gap-2 items-center">
+            {update ? (
+              <>
+                <Pencil size={18} />
+                Atualizar
+              </>
+            ) : (
+              <>
+                Nova Lista
+                <Plus />
+              </>
+            )}
+          </button>
+        )}
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay />

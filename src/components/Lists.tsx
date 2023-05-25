@@ -7,10 +7,12 @@ import { ChevronDown, Share, Trash } from 'lucide-react'
 import { ListDTO } from '@/dtos/ListDTO'
 import { useLists } from '@/hooks/useLists'
 import { CreateListModal } from './CreateListModal'
+import { useEffect } from 'react'
 
 export const Lists = () => {
   const {
     lists,
+    loadLists,
     removeList,
     removeItemFromList,
     getRandomItemFromList,
@@ -49,6 +51,12 @@ export const Lists = () => {
     }
     return 'Sorteio não realizado'
   }
+
+  useEffect(() => {
+    if (lists.length === 0) {
+      loadLists()
+    }
+  }, [lists.length, loadLists])
 
   return (
     <div className="w-full flex flex-1 flex-col items-center justify-center px-8">
