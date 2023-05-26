@@ -3,12 +3,14 @@ import { HTMLAttributes } from 'react'
 
 type ButtonProps = HTMLAttributes<HTMLButtonElement> & {
   circle?: boolean
+  disabled?: boolean
 }
 
 export const Button = ({
   children,
   className,
   circle = false,
+  disabled = false,
   ...rest
 }: ButtonProps) => {
   const classNames = clsx(
@@ -17,10 +19,11 @@ export const Button = ({
     {
       'rounded-full': circle,
       rounded: !circle,
+      'disabled:opacity-50': disabled,
     },
   )
   return (
-    <button className={classNames} {...rest}>
+    <button disabled={disabled} className={classNames} {...rest}>
       {children}
     </button>
   )

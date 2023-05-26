@@ -1,3 +1,4 @@
+import 'react-toastify/dist/ReactToastify.css'
 import { Home, List, User } from 'lucide-react'
 
 import ActiveLink from '@/components/ActiveLink'

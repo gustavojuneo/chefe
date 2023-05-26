@@ -9,26 +9,54 @@ export async function GET(req: Request, { params }: any) {
   const session = await getServerSession(authOptions)
   const id = params.id
 
+  if (!session) {
+    return NextResponse.json(
+      { message: 'É necessário estar logado.' },
+      { status: 401 },
+    )
+  }
+
+  const { user } = session
+
   const list = await prismaClient.list.findFirst({
     where: { id },
     include: {
       itens: true,
       members: true,
+      users_invitations: true,
       _count: { select: { members: true, itens: true } },
     },
   })
+
+  if (!list) {
+    return NextResponse.json({ message: 'A Lista não existe' }, { status: 404 })
+  }
 
   const isMember = session
     ? list?.members.map((member) => member.userId).includes(session.user.id)
     : false
 
-  if (list?.restricted && list?.ownerId !== session?.user.id && !isMember) {
+  const hasInvite =
+    list.users_invitations.some((invitate) => invitate.userId === user.id) ??
+    false
+
+  console.log(hasInvite)
+
+  if (
+    list?.restricted &&
+    list?.ownerId !== session?.user.id &&
+    !isMember &&
+    !hasInvite
+  ) {
     return NextResponse.json({ message: 'Operação inválida' }, { status: 400 })
   }
 
-  return NextResponse.json(list, {
-    status: 200,
-  })
+  return NextResponse.json(
+    { list, invited: hasInvite },
+    {
+      status: 200,
+    },
+  )
 }
 
 export async function DELETE(req: Request, { params }: any) {
@@ -42,14 +70,19 @@ export async function DELETE(req: Request, { params }: any) {
     )
   }
 
+  const { user } = session
+
   const list = await prismaClient.list.findFirst({
     where: { id },
-    include: { members: true },
+    include: { members: true, users_invitations: true },
   })
 
-  const isMember = list?.members
-    .map((member) => member.userId)
-    .includes(session.user.id)
+  if (!list) {
+    return NextResponse.json({ message: 'A Lista não existe' }, { status: 404 })
+  }
+
+  const isMember =
+    list.members.some((member) => member.userId === user.id) ?? false
 
   if (list?.ownerId !== session.user.id && !isMember) {
     return NextResponse.json({ message: 'Operação inválida' }, { status: 400 })

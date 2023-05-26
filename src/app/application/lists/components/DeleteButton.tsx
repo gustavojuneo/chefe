@@ -10,6 +10,8 @@ type ButtonProps = {
   showLabel?: boolean
   circle?: boolean
   isLoading?: boolean
+  inListPage?: boolean
+  disabled?: boolean
 }
 
 export const DeleteButton = ({
@@ -17,6 +19,8 @@ export const DeleteButton = ({
   circle = true,
   showLabel = false,
   isLoading = false,
+  inListPage = false,
+  disabled = false,
 }: ButtonProps) => {
   const { removeList } = useLists()
 
@@ -40,7 +44,8 @@ export const DeleteButton = ({
     <Button
       circle={circle}
       className="bg-red-400 hover:bg-red-500"
-      onClick={() => removeList(listId)}
+      disabled={disabled}
+      onClick={() => removeList(listId, inListPage)}
     >
       <Trash size={18} />
       {showLabel ? 'Delete' : null}

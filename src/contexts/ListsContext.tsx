@@ -1,24 +1,26 @@
+import { GetListDTO } from '@/dtos/GetListDto'
 import { ListDTO } from '@/dtos/ListDTO'
-import { ListItemDTO } from '@/dtos/ListItemDTO'
 import { api } from '@/lib/axios'
-import { createContext, useCallback, useState } from 'react'
-
-type LastChoosedItem = {
-  listId: string
-  item: ListItemDTO
-}
+import { useRouter } from 'next/navigation'
+import { createContext, useCallback, useReducer, useState } from 'react'
+import { LastChoosedItem, reducer } from './reducer'
+import { ListActionTypes } from './actionTypes'
 
 export type AuthContextDataProps = {
   lists: ListDTO[]
   createList: (data: ListDTO) => void
   updateList: (data: ListDTO) => void
   getRandomItemFromList: (list: ListDTO, all?: boolean) => void
-  removeList: (listId: string) => void
+  removeList: (listId: string, inListPage: boolean) => void
   removeItemFromList: (listId: string, itemId: string) => Promise<void>
   lastChoosedItem: LastChoosedItem | null
   hasItensToChoose: (listId: string) => boolean
   isLoading: boolean
   loadLists: () => Promise<void>
+  getCurrentList: (id: string) => Promise<void>
+  isGetting: boolean
+  current: GetListDTO
+  previewList: boolean
 }
 
 type ProviderProps = {
@@ -29,61 +31,59 @@ export const ListsContext = createContext<AuthContextDataProps>(
   {} as AuthContextDataProps,
 )
 
-export const ListsProvider = ({ children }: ProviderProps) => {
-  const [lists, setLists] = useState<ListDTO[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [lastChoosedItem, setLastChoosedItem] =
-    useState<LastChoosedItem | null>(null)
+const initialState = {
+  lists: [] as ListDTO[],
+  previewList: false,
+  current: {} as GetListDTO,
+  lastChoosedItem: null,
+}
 
-  const hasItensToChoose = (listId: string) =>
-    !!lists
+export const ListsProvider = ({ children }: ProviderProps) => {
+  const router = useRouter()
+  const [state, dispatch] = useReducer(reducer, initialState)
+  const [isGetting, setIsGetting] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
+
+  const { lists, current, lastChoosedItem, previewList } = state
+
+  const hasItensToChoose = (listId: string) => {
+    if (current.id) {
+      return !!current.itens?.some((item) => !item.choosed)
+    }
+    return !!lists
       .find((list) => list.id === listId)
       ?.itens?.some((item) => !item.choosed)
+  }
 
   const createList = async (data: ListDTO) => {
     const response = await api.post('/lists', { data })
     const { list } = response.data
-    const formattedList: ListDTO = {
-      id: list.id,
-      name: list.name,
-      itens: list.itens,
-    }
 
-    const newLists = [...lists, formattedList]
-    setLists(newLists)
+    dispatch({ type: ListActionTypes.ADD_NEW_LIST, payload: { list } })
   }
 
   const updateList = async (data: ListDTO) => {
     const response = await api.put(`/lists/${data.id}`, { data })
     const { list } = response.data
-    const formattedList: ListDTO = {
-      id: list.id,
-      name: list.name,
-      itens: list.itens,
-    }
-    const newLists = lists.map((item) =>
-      item.id === formattedList.id ? { ...formattedList } : { ...item },
-    )
-
-    setLists(newLists)
+    dispatch({ type: ListActionTypes.UPDATE_LIST, payload: { list } })
   }
 
-  const removeList = async (listId: string) => {
-    const newLists = lists.filter((list) => list.id !== listId)
+  const removeList = async (listId: string, inListPage: boolean = false) => {
     await api.delete(`/lists/${listId}`)
-    setLists(newLists)
+
+    dispatch({ type: ListActionTypes.REMOVE_LIST, payload: { listId } })
+    if (inListPage) {
+      router.push('/application/new-lists')
+    }
   }
 
   const removeItemFromList = async (listId: string, itemId: string) => {
     await api.delete(`/lists/${listId}/item/${itemId}`)
-    const list = lists.find((list) => list.id === listId)
-    const filteredItens =
-      list?.itens?.filter((item) => item.id !== itemId) ?? []
-    const newLists = lists.map((list) => {
-      if (list.id === listId) return { ...list, itens: filteredItens }
-      return list
+
+    dispatch({
+      type: ListActionTypes.REMOVE_ITEM_FROM_LIST,
+      payload: { listId, itemId },
     })
-    setLists(newLists)
   }
 
   const getRandomItemFromList = async (list: ListDTO, all: boolean = false) => {
@@ -111,12 +111,36 @@ export const ListsProvider = ({ children }: ProviderProps) => {
                 }
               : { ...current },
           )
-          setLists(updatedLists)
+          dispatch({
+            type: ListActionTypes.UPDATE_ALL_LISTS,
+            payload: { lists: updatedLists },
+          })
         }
-        setLastChoosedItem({ listId: list.id!, item })
+        dispatch({
+          type: ListActionTypes.CHOOSE_ITEM,
+          payload: {
+            choosedItem: item,
+            listId: list.id,
+          },
+        })
       }
     }
   }
+
+  const getCurrentList = useCallback(async (id: string) => {
+    try {
+      setIsGetting(true)
+      const response = await api.get(`/lists/${id}`)
+      const { data } = response
+      const { list, invited } = data
+
+      dispatch({ type: ListActionTypes.GET_LIST, payload: { list, invited } })
+    } catch (err) {
+      console.log(err)
+    } finally {
+      setIsGetting(false)
+    }
+  }, [])
 
   const loadLists = useCallback(async () => {
     setIsLoading(true)
@@ -124,7 +148,7 @@ export const ListsProvider = ({ children }: ProviderProps) => {
       const response = await api.get('/lists')
       const { lists } = response.data
 
-      setLists(lists)
+      dispatch({ type: ListActionTypes.FETCH_LISTS, payload: { lists } })
     } finally {
       setIsLoading(false)
     }
@@ -143,6 +167,10 @@ export const ListsProvider = ({ children }: ProviderProps) => {
         hasItensToChoose,
         isLoading,
         loadLists,
+        getCurrentList,
+        current,
+        isGetting,
+        previewList,
       }}
     >
       {children}

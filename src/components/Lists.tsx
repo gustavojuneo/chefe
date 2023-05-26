@@ -8,6 +8,8 @@ import { ListDTO } from '@/dtos/ListDTO'
 import { useLists } from '@/hooks/useLists'
 import { CreateListModal } from './CreateListModal'
 import { useEffect } from 'react'
+import { usePathname } from 'next/navigation'
+import { FormData } from './CreateListForm'
 
 export const Lists = () => {
   const {
@@ -19,6 +21,7 @@ export const Lists = () => {
     lastChoosedItem,
     hasItensToChoose,
   } = useLists()
+  const pathname = usePathname()
   const accordionContentClass = clsx([
     'overflow-hidden',
     'bg-zinc-100 rounded-b-md',
@@ -40,7 +43,7 @@ export const Lists = () => {
   }
 
   const handleShareList = (listId?: string) => {
-    const shareLink = `https://chefe.gustavojuneo.dev/application/lists/${listId}/invite`
+    const shareLink = `${pathname}${listId}/invite`
     navigator.clipboard.writeText(shareLink)
   }
 
@@ -81,7 +84,7 @@ export const Lists = () => {
                   >
                     <Share size={22} />
                   </button>
-                  <CreateListModal defaultData={list} update />
+                  <CreateListModal defaultData={list as FormData} update />
                   <button
                     className="ml-auto flex gap-2 p-2 text-sm transition items-center bg-red-500 hover:bg-red-600 rounded text-zinc-100"
                     onClick={() => handleRemoveList(list.id!)}

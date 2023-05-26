@@ -1,13 +1,27 @@
-import { Header } from '@/components/Header'
-import { Lists as ListsComponent } from '@/components/Lists'
+'use client'
 
-export default async function Lists() {
+import { Header } from '@/components/Header'
+import { List } from './components/List'
+import { CreateListModal } from '@/components/CreateListModal'
+import { useLists } from '@/hooks/useLists'
+import { useEffect } from 'react'
+
+export default function Lists() {
+  const { lists, loadLists, isLoading } = useLists()
+
+  useEffect(() => {
+    if (lists.length === 0) {
+      loadLists()
+    }
+  }, [lists.length, loadLists])
+
   return (
     <div className="flex flex-col w-full h-full">
       <Header />
-      <div className="w-full h-full flex flex-col mt-10">
-        <ListsComponent />
+      <div className="flex w-full justify-center gap-2 mt-8">
+        <CreateListModal isLoading={isLoading} />
       </div>
+      <List />
     </div>
   )
 }

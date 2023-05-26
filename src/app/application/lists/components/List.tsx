@@ -1,25 +1,30 @@
 'use client'
 
+import Link from 'next/link'
 import { DeleteButton } from './DeleteButton'
+import { ShareButton } from './ShareButton'
 import { useState } from 'react'
+import { usePathname } from 'next/navigation'
+import { useLists } from '@/hooks/useLists'
 import { useSession } from 'next-auth/react'
 import { SearchInput } from '@/components/SearchInput'
-import { GetListDTO } from '@/dtos/GetListDto'
 
-type ItensProps = {
-  list: GetListDTO
-  isLoadingList?: boolean
-}
-
-export const Itens = ({ list, isLoadingList = false }: ItensProps) => {
+export const List = () => {
+  const {
+    lists,
+    isLoading: isListLoading,
+    // removeItemFromList,
+    // getRandomItemFromList,
+    // lastChoosedItem,
+    // hasItensToChoose,
+  } = useLists()
   const session = useSession()
+  const pathname = usePathname()
   const [inputValue, setInputValue] = useState('')
-  const itensFromList = list?.itens ?? []
-  const filteredItens =
-    itensFromList.filter((item) =>
-      item.name.toLowerCase().includes(inputValue.toLowerCase()),
-    ) ?? []
-  const isLoading = session?.status === 'loading' || isLoadingList
+  const filteredItens = lists.filter((item) =>
+    item.name.toLowerCase().includes(inputValue.toLowerCase()),
+  )
+  const isLoading = session?.status === 'loading' || isListLoading
 
   return (
     <div className="w-full flex flex-col mt-10">
@@ -46,21 +51,20 @@ export const Itens = ({ list, isLoadingList = false }: ItensProps) => {
           ))
         ) : (
           <>
-            {filteredItens.map((item) => (
+            {filteredItens.map((list) => (
               <li
-                key={item.id}
+                key={list.id}
                 className="py-3 px-2 flex items-center justify-between"
               >
-                <div className="flex flex-1 h-full items-center text-zinc-600 hover:text-zinc-800 transition">
-                  <span
-                    className="font-semibold max-w-[80%] truncate"
-                    title={item.name}
-                  >
-                    {item.name}
-                  </span>
-                </div>
+                <Link
+                  href={`${pathname}/${list.id}`}
+                  className="flex flex-1 h-full items-center text-zinc-600 hover:text-zinc-800 transition"
+                >
+                  <span className="font-semibold">{list.name}</span>
+                </Link>
                 <div className="flex items-center gap-2">
-                  <DeleteButton listId={list.id} itemId={item.id ?? ''} />
+                  <ShareButton listId={list.id ?? ''} />
+                  <DeleteButton listId={list.id ?? ''} />
                 </div>
               </li>
             ))}

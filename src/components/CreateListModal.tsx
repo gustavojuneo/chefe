@@ -11,21 +11,27 @@ type Props = {
   defaultData?: FormData
   update?: boolean
   isLoading?: boolean
+  disabled?: boolean
 }
 
 export const CreateListModal = ({
   defaultData,
   update = false,
-  isLoading = true,
+  isLoading = false,
+  disabled = false,
 }: Props) => {
   const [opened, setOpened] = useState(false)
+  const isDisabled = isLoading || disabled
 
   const handleToggleModal = (open: boolean) => {
     setOpened(open)
   }
 
   return (
-    <Dialog.Root open={opened} onOpenChange={handleToggleModal}>
+    <Dialog.Root
+      open={opened}
+      onOpenChange={(open) => (isDisabled ? () => {} : handleToggleModal(open))}
+    >
       <Dialog.Trigger asChild>
         {isLoading ? (
           <div className="animate-pulse">
@@ -39,7 +45,15 @@ export const CreateListModal = ({
             </div>
           </div>
         ) : (
-          <button className="p-2 bg-green-500 text-white font-medium rounded-md flex justify-center gap-2 items-center">
+          <button
+            disabled={isDisabled}
+            className={clsx(
+              'p-2 bg-green-500 text-white font-medium rounded-md flex justify-center gap-2 items-center',
+              {
+                'disabled:opacity-50': isDisabled,
+              },
+            )}
+          >
             {update ? (
               <>
                 <Pencil size={18} />

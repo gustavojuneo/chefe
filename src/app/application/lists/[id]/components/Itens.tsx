@@ -1,37 +1,26 @@
 'use client'
 
-import Link from 'next/link'
 import { DeleteButton } from './DeleteButton'
-import { ShareButton } from './ShareButton'
-import { useEffect, useState } from 'react'
-import { usePathname } from 'next/navigation'
-import { useLists } from '@/hooks/useLists'
+import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { SearchInput } from '@/components/SearchInput'
+import { GetListDTO } from '@/dtos/GetListDto'
+import clsx from 'clsx'
 
-export const List = () => {
-  const {
-    lists,
-    isLoading: isListLoading,
-    loadLists,
-    // removeItemFromList,
-    // getRandomItemFromList,
-    // lastChoosedItem,
-    // hasItensToChoose,
-  } = useLists()
+type ItensProps = {
+  list: GetListDTO
+  isLoadingList?: boolean
+}
+
+export const Itens = ({ list, isLoadingList = false }: ItensProps) => {
   const session = useSession()
-  const pathname = usePathname()
   const [inputValue, setInputValue] = useState('')
-  const filteredItens = lists.filter((item) =>
-    item.name.toLowerCase().includes(inputValue.toLowerCase()),
-  )
-  const isLoading = session?.status === 'loading' || isListLoading
-
-  useEffect(() => {
-    if (lists.length === 0) {
-      loadLists()
-    }
-  }, [loadLists, lists.length])
+  const itensFromList = list?.itens ?? []
+  const filteredItens =
+    itensFromList.filter((item) =>
+      item.name.toLowerCase().includes(inputValue.toLowerCase()),
+    ) ?? []
+  const isLoading = session?.status === 'loading' || isLoadingList
 
   return (
     <div className="w-full flex flex-col mt-10">
@@ -58,20 +47,23 @@ export const List = () => {
           ))
         ) : (
           <>
-            {filteredItens.map((list) => (
+            {filteredItens.map((item) => (
               <li
-                key={list.id}
+                key={item.id}
                 className="py-3 px-2 flex items-center justify-between"
               >
-                <Link
-                  href={`${pathname}/${list.id}`}
-                  className="flex flex-1 h-full items-center text-zinc-600 hover:text-zinc-800 transition"
-                >
-                  <span className="font-semibold">{list.name}</span>
-                </Link>
+                <div className="flex flex-1 h-full items-center text-zinc-600 hover:text-zinc-800 transition">
+                  <span
+                    className={clsx('font-semibold max-w-[80%] truncate', {
+                      'text-green-500': item.choosed,
+                    })}
+                    title={item.name}
+                  >
+                    {item.name}
+                  </span>
+                </div>
                 <div className="flex items-center gap-2">
-                  <ShareButton />
-                  <DeleteButton listId={list.id ?? ''} />
+                  <DeleteButton listId={list.id} itemId={item.id ?? ''} />
                 </div>
               </li>
             ))}
