@@ -11,6 +11,7 @@ type ButtonProps = {
   circle?: boolean
   isLoading?: boolean
   disabled?: boolean
+  onShare: (listId: string) => void
 }
 
 export const ShareButton = ({
@@ -19,12 +20,10 @@ export const ShareButton = ({
   showLabel = false,
   isLoading = false,
   disabled = false,
+  onShare,
 }: ButtonProps) => {
-  const pathname = usePathname()
-
-  const handleShareList = (listId?: string) => {
-    const shareLink = `https://chefe.gustavojuneo.dev${pathname}/${listId}?usp=sharing`
-    navigator.clipboard.writeText(shareLink)
+  const handleShareList = (listId: string) => {
+    onShare(listId)
   }
 
   if (isLoading) {
