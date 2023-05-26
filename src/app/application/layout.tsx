@@ -1,3 +1,4 @@
+import 'react-toastify/dist/ReactToastify.css'
 import { Home, List, User } from 'lucide-react'
 
 import ActiveLink from '@/components/ActiveLink'
@@ -19,7 +20,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <Main>{children}</Main>
-      <footer className="mt-auto w-full flex justify-center bg-zinc-100 fixed bottom-0">
+      <footer
+        id="root-footer"
+        className="mt-auto w-full flex justify-center bg-zinc-100 fixed bottom-0"
+      >
         <div className="w-full max-w-[375px]">
           <nav className="w-ful">
             <ul className="flex gap-24 text-lg justify-center">

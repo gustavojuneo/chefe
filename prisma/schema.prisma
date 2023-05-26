@@ -43,15 +43,16 @@ model Session {
 }
 
 model User {
-  id            String           @id @default(cuid())
+  id            String            @id @default(cuid())
   name          String?
-  email         String?          @unique
+  email         String?           @unique
   emailVerified DateTime?
   image         String?
   accounts      Account[]
   sessions      Session[]
   lists         List[]
   member        MembersOnLists[]
+  invitations   ListInvitations[]
 }
 
 model VerificationToken {
@@ -68,12 +69,27 @@ model List {
   created_at DateTime  @default(now())
   updated_at DateTime? @updatedAt
   ownerId    String
+  restricted Boolean?  @default(true)
 
-  owner   User             @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  itens   ListItem[]
-  members MembersOnLists[]
+  owner             User              @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  itens             ListItem[]
+  members           MembersOnLists[]
+  users_invitations ListInvitations[]
 
   @@index([ownerId])
+}
+
+model ListInvitations {
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  list   List   @relation(fields: [listId], references: [id])
+  listId String
+
+  @@id([userId, listId])
+  @@unique([userId, listId])
+  @@index([userId])
+  @@index([listId])
 }
 
 model MembersOnLists {

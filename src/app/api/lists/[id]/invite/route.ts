@@ -15,31 +15,40 @@ export async function PATCH(req: Request, { params }: any) {
     )
   }
 
+  const { user } = session
+
   const list = await prismaClient.list.findFirst({
-    where: {
-      OR: [
-        { id, ownerId: session.user.id },
-        {
-          AND: [
-            { id },
-            {
-              members: {
-                some: {
-                  userId: session.user.id,
-                },
-              },
-            },
-          ],
-        },
-      ],
-    },
+    include: { members: true, users_invitations: true },
+    where: { id },
   })
 
-  if (list) {
+  if (!list) {
     return NextResponse.json(
-      { message: 'Usuário já esta vinculado a esta lista.' },
+      {
+        message: 'A Lista não existe',
+      },
+      { status: 404 },
+    )
+  }
+
+  const isMember =
+    list.members.some((member) => member.userId === user.id) ?? false
+
+  const hasInvite =
+    list.users_invitations.some((invitate) => invitate.userId === user.id) ??
+    false
+
+  if (list.restricted && list.ownerId !== user.id && !isMember && !hasInvite) {
+    return NextResponse.json(
+      {
+        message: 'Você não é membro desta lista ou não possui um convite.',
+      },
       { status: 400 },
     )
+  }
+
+  if (isMember || list.ownerId === user.id) {
+    return NextResponse.json({}, { status: 200 })
   }
 
   await prismaClient.list.update({
@@ -52,10 +61,21 @@ export async function PATCH(req: Request, { params }: any) {
           userId: session.user.id,
         },
       },
+      users_invitations: {
+        delete: {
+          userId_listId: {
+            userId: user.id,
+            listId: list.id,
+          },
+        },
+      },
     },
   })
 
-  return NextResponse.json({
-    status: 201,
-  })
+  return NextResponse.json(
+    {
+      message: 'Agora você é um membro da lista.',
+    },
+    { status: 201 },
+  )
 }

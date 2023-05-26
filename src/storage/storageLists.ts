@@ -23,7 +23,7 @@ export const storageListsRemoveItem = (listId: string, itemId: string) => {
   const list: ListDTO[] = storage ? JSON.parse(storage) : []
   const currentList = list.find((item) => item.id === listId)
   const filteredItens =
-    currentList?.itens.filter((item) => item.id !== itemId) ?? []
+    currentList?.itens?.filter((item) => item.id !== itemId) ?? []
   const newLists = list.map((list) => {
     if (list.id === listId) return { ...list, itens: filteredItens }
     return list
