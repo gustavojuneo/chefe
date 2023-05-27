@@ -9,7 +9,7 @@ import { CreateListModal } from '@/components/CreateListModal'
 import { DeleteButton } from '../components/DeleteButton'
 import { useLists } from '@/hooks/useLists'
 import { api } from '@/lib/axios'
-import { ToastContainer, toast } from 'react-toastify'
+import { toast } from 'react-toastify'
 import { isAxiosError } from 'axios'
 import { ListDTO } from '@/dtos/ListDTO'
 import { ShareButton } from '../components/ShareButton'
@@ -88,7 +88,6 @@ export default function ListItens({ params, searchParams }: ListItensProps) {
 
   return (
     <div className="flex flex-col w-full h-full">
-      <ToastContainer />
       <div className="flex flex-col mb-6">
         <button onClick={() => router.back()} className="text-zinc-800">
           <ArrowLeft size={24} />
@@ -118,13 +117,13 @@ export default function ListItens({ params, searchParams }: ListItensProps) {
           inListPage
           disabled={previewList}
         />
-        <ShareButton
+        {/* <ShareButton
           circle={false}
           listId={list.id}
           showLabel
           isLoading={isLoadingList}
           disabled={previewList}
-        />
+        /> */}
       </div>
       <div className="mt-10 flex flex-col items-center">
         <button

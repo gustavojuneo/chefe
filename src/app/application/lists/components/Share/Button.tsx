@@ -1,9 +1,8 @@
 'use client'
 
-import { Button } from '@/components/Button'
+import { Button as ButtonComponent } from '@/components/Button'
 import clsx from 'clsx'
 import { Share } from 'lucide-react'
-import { usePathname } from 'next/navigation'
 
 type ButtonProps = {
   listId: string
@@ -14,7 +13,7 @@ type ButtonProps = {
   onShare: (listId: string) => void
 }
 
-export const ShareButton = ({
+export const Button = ({
   listId,
   circle = true,
   showLabel = false,
@@ -43,7 +42,7 @@ export const ShareButton = ({
   }
 
   return (
-    <Button
+    <ButtonComponent
       circle={circle}
       className="bg-blue-400 hover:bg-blue-700"
       disabled={disabled}
@@ -51,6 +50,6 @@ export const ShareButton = ({
     >
       <Share size={18} />
       {showLabel ? 'Share' : null}
-    </Button>
+    </ButtonComponent>
   )
 }
