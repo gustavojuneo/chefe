@@ -13,6 +13,7 @@ import { toast } from 'react-toastify'
 import { isAxiosError } from 'axios'
 import { ListDTO } from '@/dtos/ListDTO'
 import * as Share from '../components/Share'
+import Link from 'next/link'
 
 type ListItensProps = {
   params: {
@@ -81,9 +82,9 @@ export default function ListItens({ params, searchParams }: ListItensProps) {
   return (
     <div className="flex flex-col w-full h-full">
       <div className="flex flex-col mb-6">
-        <button onClick={() => router.back()} className="text-zinc-800">
+        <Link href="/application/lists" className="text-zinc-800">
           <ArrowLeft size={24} />
-        </button>
+        </Link>
         {isLoadingList ? (
           <div className="animate-pulse self-center h-[36px] mb-6">
             <span className="bg-slate-200 block w-[100px] h-[36px] rounded" />
