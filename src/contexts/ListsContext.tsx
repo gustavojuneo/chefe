@@ -76,7 +76,7 @@ export const ListsProvider = ({ children }: ProviderProps) => {
 
     dispatch({ type: ListActionTypes.REMOVE_LIST, payload: { listId } })
     if (inListPage) {
-      router.push('/application/new-lists')
+      router.push('/application/lists')
     }
   }
 
