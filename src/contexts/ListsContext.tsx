@@ -5,6 +5,8 @@ import { ListDTO } from '@/dtos/ListDTO'
 import { api } from '@/lib/axios'
 import { LastChoosedItem, reducer } from './reducer'
 import { ListActionTypes } from './actionTypes'
+import { toast } from 'react-toastify'
+import { isAxiosError } from 'axios'
 
 export type AuthContextDataProps = {
   lists: ListDTO[]
@@ -23,6 +25,7 @@ export type AuthContextDataProps = {
   previewList: boolean
   changeListVisibility: (listId: string) => Promise<void>
   alreadyLoadListsFirstTime: boolean
+  acceptInvite: (listId: string) => Promise<void>
 }
 
 type ProviderProps = {
@@ -136,20 +139,23 @@ export const ListsProvider = ({ children }: ProviderProps) => {
     }
   }
 
-  const getCurrentList = useCallback(async (id: string) => {
-    try {
-      setIsGetting(true)
-      const response = await api.get(`/lists/${id}`)
-      const { data } = response
-      const { list, invited } = data
+  const getCurrentList = useCallback(
+    async (id: string) => {
+      try {
+        setIsGetting(true)
+        const response = await api.get(`/lists/${id}`)
+        const { data } = response
+        const { list, invited } = data
 
-      dispatch({ type: ListActionTypes.GET_LIST, payload: { list, invited } })
-    } catch (err) {
-      console.log(err)
-    } finally {
-      setIsGetting(false)
-    }
-  }, [])
+        dispatch({ type: ListActionTypes.GET_LIST, payload: { list, invited } })
+      } catch (err) {
+        router.push('/application/lists')
+      } finally {
+        setIsGetting(false)
+      }
+    },
+    [router],
+  )
 
   const loadLists = useCallback(async () => {
     setIsLoading(true)
@@ -161,6 +167,29 @@ export const ListsProvider = ({ children }: ProviderProps) => {
       alreadyLoadListsFirstTime.current = true
     } finally {
       setIsLoading(false)
+    }
+  }, [])
+
+  const acceptInvite = useCallback(async (listId: string) => {
+    try {
+      const response = await api.patch(`lists/${listId}/invite`)
+      const { data } = response
+      if (data.message) {
+        toast.success(data.message, {
+          position: 'top-center',
+          closeOnClick: true,
+          theme: 'colored',
+        })
+      }
+      dispatch({ type: ListActionTypes.ACCEPT_INVITE, payload: null })
+    } catch (err) {
+      if (isAxiosError(err)) {
+        toast.error(err?.response?.data.message, {
+          position: 'top-center',
+          closeOnClick: true,
+          theme: 'colored',
+        })
+      }
     }
   }, [])
 
@@ -183,6 +212,7 @@ export const ListsProvider = ({ children }: ProviderProps) => {
         previewList,
         changeListVisibility,
         alreadyLoadListsFirstTime: alreadyLoadListsFirstTime.current,
+        acceptInvite,
       }}
     >
       {children}

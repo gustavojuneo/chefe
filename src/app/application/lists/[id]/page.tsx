@@ -32,6 +32,7 @@ export default function ListItens({ params, searchParams }: ListItensProps) {
     hasItensToChoose,
     getRandomItemFromList,
     lastChoosedItem,
+    acceptInvite,
   } = useLists()
   const router = useRouter()
   const [sharing, setSharing] = useState<{
@@ -61,28 +62,6 @@ export default function ListItens({ params, searchParams }: ListItensProps) {
     return 'Sorteio não realizado'
   }
 
-  const acceptInvite = useCallback(async () => {
-    try {
-      const response = await api.patch(`lists/${params.id}/invite`)
-      const { data } = response
-      if (data.message) {
-        toast.success(data.message, {
-          position: 'top-center',
-          closeOnClick: true,
-          theme: 'colored',
-        })
-      }
-    } catch (err) {
-      if (isAxiosError(err)) {
-        toast.error(err?.response?.data.message, {
-          position: 'top-center',
-          closeOnClick: true,
-          theme: 'colored',
-        })
-      }
-    }
-  }, [params.id])
-
   const handleOnShareList = (opened: boolean, listId?: string) => {
     if (opened && listId) {
       setSharing({ showModal: opened, listId })
@@ -92,14 +71,12 @@ export default function ListItens({ params, searchParams }: ListItensProps) {
   }
 
   useEffect(() => {
-    getCurrentList(params.id)
-  }, [getCurrentList, params.id])
-
-  useEffect(() => {
-    if (searchParams.usp === 'sharing') {
-      acceptInvite()
-    }
-  }, [acceptInvite, searchParams.usp])
+    getCurrentList(params.id).then(() => {
+      if (searchParams.usp === 'sharing') {
+        acceptInvite(params.id)
+      }
+    })
+  }, [getCurrentList, params.id, acceptInvite, searchParams.usp])
 
   return (
     <div className="flex flex-col w-full h-full">

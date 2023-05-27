@@ -109,6 +109,11 @@ export const reducer = (state: State, action: ListAction): State => {
 
       return { ...state, current, lists: newLists }
     }
+
+    case ListActionTypes.ACCEPT_INVITE: {
+      return { ...state, previewList: false }
+    }
+
     default:
       return { ...state }
   }

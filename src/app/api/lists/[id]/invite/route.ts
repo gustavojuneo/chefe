@@ -41,7 +41,7 @@ export async function PATCH(req: Request, { params }: any) {
   if (list.restricted && list.ownerId !== user.id && !isMember && !hasInvite) {
     return NextResponse.json(
       {
-        message: 'Você não é membro desta lista ou não possui um convite.',
+        message: 'Você não possui um convite para esta lista.',
       },
       { status: 400 },
     )
@@ -62,12 +62,14 @@ export async function PATCH(req: Request, { params }: any) {
         },
       },
       users_invitations: {
-        delete: {
-          userId_listId: {
-            userId: user.id,
-            listId: list.id,
-          },
-        },
+        delete: hasInvite
+          ? {
+              userId_listId: {
+                userId: user.id,
+                listId: list.id,
+              },
+            }
+          : undefined,
       },
     },
   })

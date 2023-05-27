@@ -9,6 +9,7 @@ import { api } from '@/lib/axios'
 import { isAxiosError } from 'axios'
 import { toast } from 'react-toastify'
 import { Spinner } from '@/components/Spinner'
+import { useSession } from 'next-auth/react'
 
 type ShareContainerProps = {
   listId: string | null
@@ -23,6 +24,7 @@ export const Container = ({
 }: ShareContainerProps) => {
   const { getCurrentList, current, isGetting, changeListVisibility } =
     useLists()
+  const { data: session } = useSession()
   const [copied, setCopied] = useState(false)
   // eslint-disable-next-line no-undef
   const resetCopy = useRef<NodeJS.Timeout>()
@@ -145,66 +147,76 @@ export const Container = ({
                       )}
                     </span>
                     <div>
-                      <DropdownMenu.Root>
-                        <DropdownMenu.Trigger asChild>
-                          <button className="flex items-center text-sm font-medium p-2 rounded hover:bg-zinc-200 gap-2 transition">
-                            {current.restricted
-                              ? 'Restrito'
-                              : 'Qualquer pessoa com o link'}
-                            <ChevronDown size={16} />
-                          </button>
-                        </DropdownMenu.Trigger>
-                        <DropdownMenu.Portal>
-                          <DropdownMenu.Content
-                            align="start"
-                            className={clsx([
-                              'bg-zinc-50 shadow-md rounded py-2 transition',
-                              'radix-side-bottom:animate-slideUpAndFade',
-                            ])}
-                          >
-                            <DropdownMenu.Item
-                              className="flex items-center hover:bg-zinc-200 px-4 cursor-pointer"
-                              onClick={() =>
-                                !current.restricted
-                                  ? handleChangeVisibility()
-                                  : () => {}
-                              }
+                      {current.ownerId === session?.user.id ? (
+                        <DropdownMenu.Root>
+                          <DropdownMenu.Trigger asChild>
+                            <button className="flex items-center text-sm font-medium p-2 rounded hover:bg-zinc-200 gap-2 transition">
+                              {current.restricted
+                                ? 'Restrito'
+                                : 'Qualquer pessoa com o link'}
+                              <ChevronDown size={16} />
+                            </button>
+                          </DropdownMenu.Trigger>
+                          <DropdownMenu.Portal>
+                            <DropdownMenu.Content
+                              align="start"
+                              className={clsx([
+                                'bg-zinc-50 shadow-md rounded py-2 transition',
+                                'radix-side-bottom:animate-slideUpAndFade',
+                              ])}
                             >
-                              <span
-                                className={clsx(
-                                  'min-w-[24px] min-h-[24px] p-2 box-content',
-                                  {
-                                    'text-red-500': current.restricted,
-                                  },
-                                )}
+                              <DropdownMenu.Item
+                                className="flex items-center hover:bg-zinc-200 px-4 cursor-pointer"
+                                onClick={() =>
+                                  !current.restricted &&
+                                  current.ownerId === session?.user.id
+                                    ? handleChangeVisibility()
+                                    : () => {}
+                                }
                               >
-                                {current.restricted && <Check />}
-                              </span>
-                              Restrito
-                            </DropdownMenu.Item>
-                            <DropdownMenu.Item
-                              className="flex items-center hover:bg-zinc-200 px-4 cursor-pointer"
-                              onClick={() =>
-                                current.restricted
-                                  ? handleChangeVisibility()
-                                  : () => {}
-                              }
-                            >
-                              <span
-                                className={clsx(
-                                  'min-w-[24px] min-h-[24px] p-2 box-content',
-                                  {
-                                    'text-red-500': !current.restricted,
-                                  },
-                                )}
+                                <span
+                                  className={clsx(
+                                    'min-w-[24px] min-h-[24px] p-2 box-content',
+                                    {
+                                      'text-red-500': current.restricted,
+                                    },
+                                  )}
+                                >
+                                  {current.restricted && <Check />}
+                                </span>
+                                Restrito
+                              </DropdownMenu.Item>
+                              <DropdownMenu.Item
+                                className="flex items-center hover:bg-zinc-200 px-4 cursor-pointer"
+                                onClick={() =>
+                                  current.restricted &&
+                                  current.ownerId === session?.user.id
+                                    ? handleChangeVisibility()
+                                    : () => {}
+                                }
                               >
-                                {!current.restricted && <Check />}
-                              </span>
-                              Qualquer pessoa com o link
-                            </DropdownMenu.Item>
-                          </DropdownMenu.Content>
-                        </DropdownMenu.Portal>
-                      </DropdownMenu.Root>
+                                <span
+                                  className={clsx(
+                                    'min-w-[24px] min-h-[24px] p-2 box-content',
+                                    {
+                                      'text-red-500': !current.restricted,
+                                    },
+                                  )}
+                                >
+                                  {!current.restricted && <Check />}
+                                </span>
+                                Qualquer pessoa com o link
+                              </DropdownMenu.Item>
+                            </DropdownMenu.Content>
+                          </DropdownMenu.Portal>
+                        </DropdownMenu.Root>
+                      ) : (
+                        <span className="flex items-center text-sm font-medium p-2 rounded gap-2 transition cursor">
+                          {current.restricted
+                            ? 'Restrito'
+                            : 'Qualquer pessoa com o link'}
+                        </span>
+                      )}
                       <small className="p-2 block">
                         {current.restricted
                           ? 'Apenas as pessoas com acesso podem abrir com o link'
