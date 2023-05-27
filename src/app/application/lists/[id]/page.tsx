@@ -1,5 +1,5 @@
 'use client'
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { ArrowLeft } from 'lucide-react'
 
 import { Itens } from './components/Itens'
@@ -12,7 +12,7 @@ import { api } from '@/lib/axios'
 import { toast } from 'react-toastify'
 import { isAxiosError } from 'axios'
 import { ListDTO } from '@/dtos/ListDTO'
-import { ShareButton } from '../components/ShareButton'
+import * as Share from '../components/Share'
 
 type ListItensProps = {
   params: {
@@ -34,6 +34,13 @@ export default function ListItens({ params, searchParams }: ListItensProps) {
     lastChoosedItem,
   } = useLists()
   const router = useRouter()
+  const [sharing, setSharing] = useState<{
+    showModal: boolean
+    listId: string | null
+  }>({
+    showModal: false,
+    listId: null,
+  })
   const defaultData: FormData = {
     itens: list?.itens?.length ? list.itens : [],
     name: list?.name ?? '',
@@ -76,6 +83,14 @@ export default function ListItens({ params, searchParams }: ListItensProps) {
     }
   }, [params.id])
 
+  const handleOnShareList = (opened: boolean, listId?: string) => {
+    if (opened && listId) {
+      setSharing({ showModal: opened, listId })
+    } else {
+      setSharing({ showModal: false, listId: null })
+    }
+  }
+
   useEffect(() => {
     getCurrentList(params.id)
   }, [getCurrentList, params.id])
@@ -117,13 +132,14 @@ export default function ListItens({ params, searchParams }: ListItensProps) {
           inListPage
           disabled={previewList}
         />
-        {/* <ShareButton
+        <Share.Button
           circle={false}
           listId={list.id}
           showLabel
           isLoading={isLoadingList}
           disabled={previewList}
-        /> */}
+          onShare={(listId) => handleOnShareList(true, listId)}
+        />
       </div>
       <div className="mt-10 flex flex-col items-center">
         <button
@@ -141,6 +157,11 @@ export default function ListItens({ params, searchParams }: ListItensProps) {
         </div>
       </div>
       <Itens list={list} isLoadingList={isLoadingList} />
+      <Share.Container
+        listId={sharing.listId}
+        opened={sharing.showModal}
+        onOpenChange={handleOnShareList}
+      />
     </div>
   )
 }

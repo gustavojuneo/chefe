@@ -1,9 +1,9 @@
-import { SyntheticEvent, useEffect } from 'react'
+import { SyntheticEvent, useEffect, useRef, useState } from 'react'
 import { useLists } from '@/hooks/useLists'
 import * as Dialog from '@radix-ui/react-dialog'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import clsx from 'clsx'
-import { Check, ChevronDown, Globe, Link2, Lock, Send } from 'lucide-react'
+import { Check, ChevronDown, Clipboard, Globe, Lock, Send } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import { api } from '@/lib/axios'
 import { isAxiosError } from 'axios'
@@ -23,9 +23,13 @@ export const Container = ({
 }: ShareContainerProps) => {
   const { getCurrentList, current, isGetting, changeListVisibility } =
     useLists()
+  const [copied, setCopied] = useState(false)
+  // eslint-disable-next-line no-undef
+  const resetCopy = useRef<NodeJS.Timeout>()
+
   const pathname = usePathname()
 
-  const handleShareList = () => {
+  const handleCopyLink = () => {
     const isMobile = /iphone|ipod|android|ie|blackberry|fennec/.test(
       navigator.userAgent.toLowerCase(),
     )
@@ -36,7 +40,7 @@ export const Container = ({
         url: shareLink,
       })
     } else {
-      navigator.clipboard.writeText(shareLink)
+      navigator.clipboard.writeText(shareLink).then(() => setCopied(true))
     }
   }
 
@@ -82,6 +86,16 @@ export const Container = ({
       getCurrentList(listId)
     }
   }, [current.id, listId, getCurrentList])
+
+  useEffect(() => {
+    if (copied) {
+      resetCopy.current = setTimeout(() => setCopied(false), 3000)
+    }
+
+    return () => {
+      clearTimeout(resetCopy.current)
+    }
+  }, [copied])
 
   return (
     <Dialog.Root open={opened} onOpenChange={onOpenChange}>
@@ -202,10 +216,18 @@ export const Container = ({
               </div>
               <footer className="flex items-center justify-between">
                 <button
-                  className="flex items-center gap-2 px-3 py-2 rounded-3xl text-blue-500 border border-zinc-400 font-semibold"
-                  onClick={handleShareList}
+                  className="flex items-center gap-2 px-3 py-2 rounded-3xl text-blue-500 border border-zinc-400 font-semibold transition"
+                  onClick={handleCopyLink}
                 >
-                  <Link2 size={18} strokeWidth={3} /> Copiar Link
+                  {!copied ? (
+                    <>
+                      <Clipboard size={18} strokeWidth={3} /> Copiar Link
+                    </>
+                  ) : (
+                    <>
+                      <Check size={18} strokeWidth={3} /> Link copiado
+                    </>
+                  )}
                 </button>
                 <button
                   className="bg-blue-500 px-3 py-2 rounded-3xl text-zinc-100"
