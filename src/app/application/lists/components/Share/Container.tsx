@@ -35,7 +35,7 @@ export const Container = ({
     const isMobile = /iphone|ipod|android|ie|blackberry|fennec/.test(
       navigator.userAgent.toLowerCase(),
     )
-    const shareLink = `https://chefe.gustavojuneo.dev${pathname}/${listId}?usp=sharing`
+    const shareLink = `https://chefe.gustavojuneo.dev/application/lists/${listId}?usp=sharing`
 
     if (isMobile && navigator.canShare?.()) {
       navigator?.share({
