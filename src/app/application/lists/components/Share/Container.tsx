@@ -219,15 +219,33 @@ export const Container = ({
                   className="flex items-center gap-2 px-3 py-2 rounded-3xl text-blue-500 border border-zinc-400 font-semibold transition"
                   onClick={handleCopyLink}
                 >
-                  {!copied ? (
-                    <>
-                      <Clipboard size={18} strokeWidth={3} /> Copiar Link
-                    </>
-                  ) : (
-                    <>
-                      <Check size={18} strokeWidth={3} /> Link copiado
-                    </>
-                  )}
+                  <div className="w-[18px] h-[18px] relative">
+                    <Clipboard
+                      size={18}
+                      strokeWidth={3}
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        strokeDasharray: 60,
+                        strokeDashoffset: copied ? -60 : 0,
+                        transition: 'all 300ms ease-in-out',
+                      }}
+                    />
+                    <Check
+                      size={18}
+                      strokeWidth={3}
+                      style={{
+                        top: 0,
+                        left: 0,
+                        position: 'absolute',
+                        strokeDasharray: 60,
+                        strokeDashoffset: copied ? 0 : -60,
+                        transition: 'all 300ms ease-in-out',
+                      }}
+                    />
+                  </div>
+                  {!copied ? 'Copiar link' : 'Link copiado'}
                 </button>
                 <button
                   className="bg-blue-500 px-3 py-2 rounded-3xl text-zinc-100"
