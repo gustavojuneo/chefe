@@ -2,29 +2,37 @@
 
 import Link from 'next/link'
 import { DeleteButton } from './DeleteButton'
-import { ShareButton } from './ShareButton'
 import { useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { useLists } from '@/hooks/useLists'
 import { useSession } from 'next-auth/react'
 import { SearchInput } from '@/components/SearchInput'
+import * as Share from './Share'
 
 export const List = () => {
-  const {
-    lists,
-    isLoading: isListLoading,
-    // removeItemFromList,
-    // getRandomItemFromList,
-    // lastChoosedItem,
-    // hasItensToChoose,
-  } = useLists()
+  const { lists, isLoading: isListLoading } = useLists()
   const session = useSession()
   const pathname = usePathname()
   const [inputValue, setInputValue] = useState('')
+  const [sharing, setSharing] = useState<{
+    showModal: boolean
+    listId: string | null
+  }>({
+    showModal: false,
+    listId: null,
+  })
   const filteredItens = lists.filter((item) =>
     item.name.toLowerCase().includes(inputValue.toLowerCase()),
   )
   const isLoading = session?.status === 'loading' || isListLoading
+
+  const handleOnShareList = (opened: boolean, listId?: string) => {
+    if (opened && listId) {
+      setSharing({ showModal: opened, listId })
+    } else {
+      setSharing({ showModal: false, listId: null })
+    }
+  }
 
   return (
     <div className="w-full flex flex-col mt-10">
@@ -63,7 +71,10 @@ export const List = () => {
                   <span className="font-semibold">{list.name}</span>
                 </Link>
                 <div className="flex items-center gap-2">
-                  <ShareButton listId={list.id ?? ''} />
+                  <Share.Button
+                    listId={list.id ?? ''}
+                    onShare={(listId) => handleOnShareList(true, listId)}
+                  />
                   <DeleteButton listId={list.id ?? ''} />
                 </div>
               </li>
@@ -71,6 +82,11 @@ export const List = () => {
           </>
         )}
       </ul>
+      <Share.Container
+        listId={sharing.listId}
+        opened={sharing.showModal}
+        onOpenChange={handleOnShareList}
+      />
     </div>
   )
 }

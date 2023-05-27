@@ -40,8 +40,6 @@ export async function GET(req: Request, { params }: any) {
     list.users_invitations.some((invitate) => invitate.userId === user.id) ??
     false
 
-  console.log(hasInvite)
-
   if (
     list?.restricted &&
     list?.ownerId !== session?.user.id &&
@@ -163,6 +161,42 @@ export async function PUT(req: Request, { params }: any) {
     { list: updatedList },
     {
       status: 201,
+    },
+  )
+}
+
+export async function PATCH(_: Request, { params }: any) {
+  const session = await getServerSession(authOptions)
+  const id = params.id
+
+  if (!session) {
+    return NextResponse.json(
+      { message: 'É necessário estar logado.' },
+      { status: 401 },
+    )
+  }
+
+  const list = await prismaClient.list.findFirst({
+    where: { id },
+    include: { members: true },
+  })
+
+  if (list?.ownerId !== session.user.id) {
+    return NextResponse.json({ message: 'Operação inválida' }, { status: 400 })
+  }
+
+  const updatedList = await prismaClient.list.update({
+    where: { id },
+    include: { itens: true },
+    data: {
+      restricted: !list.restricted,
+    },
+  })
+
+  return NextResponse.json(
+    { list: updatedList },
+    {
+      status: 200,
     },
   )
 }

@@ -1,17 +1,17 @@
+import { useRouter } from 'next/navigation'
+import { createContext, useCallback, useReducer, useRef, useState } from 'react'
 import { GetListDTO } from '@/dtos/GetListDto'
 import { ListDTO } from '@/dtos/ListDTO'
 import { api } from '@/lib/axios'
-import { useRouter } from 'next/navigation'
-import { createContext, useCallback, useReducer, useState } from 'react'
 import { LastChoosedItem, reducer } from './reducer'
 import { ListActionTypes } from './actionTypes'
 
 export type AuthContextDataProps = {
   lists: ListDTO[]
-  createList: (data: ListDTO) => void
-  updateList: (data: ListDTO) => void
+  createList: (data: ListDTO) => Promise<void>
+  updateList: (data: ListDTO) => Promise<void>
   getRandomItemFromList: (list: ListDTO, all?: boolean) => void
-  removeList: (listId: string, inListPage: boolean) => void
+  removeList: (listId: string, inListPage: boolean) => Promise<void>
   removeItemFromList: (listId: string, itemId: string) => Promise<void>
   lastChoosedItem: LastChoosedItem | null
   hasItensToChoose: (listId: string) => boolean
@@ -21,6 +21,8 @@ export type AuthContextDataProps = {
   isGetting: boolean
   current: GetListDTO
   previewList: boolean
+  changeListVisibility: (listId: string) => Promise<void>
+  alreadyLoadListsFirstTime: boolean
 }
 
 type ProviderProps = {
@@ -41,6 +43,7 @@ const initialState = {
 export const ListsProvider = ({ children }: ProviderProps) => {
   const router = useRouter()
   const [state, dispatch] = useReducer(reducer, initialState)
+  const alreadyLoadListsFirstTime = useRef(false)
   const [isGetting, setIsGetting] = useState(true)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -84,6 +87,12 @@ export const ListsProvider = ({ children }: ProviderProps) => {
       type: ListActionTypes.REMOVE_ITEM_FROM_LIST,
       payload: { listId, itemId },
     })
+  }
+
+  const changeListVisibility = async (listId: string) => {
+    const response = await api.patch(`/lists/${listId}`)
+    const { list } = response.data
+    dispatch({ type: ListActionTypes.UPDATE_LIST, payload: { list } })
   }
 
   const getRandomItemFromList = async (list: ListDTO, all: boolean = false) => {
@@ -149,6 +158,7 @@ export const ListsProvider = ({ children }: ProviderProps) => {
       const { lists } = response.data
 
       dispatch({ type: ListActionTypes.FETCH_LISTS, payload: { lists } })
+      alreadyLoadListsFirstTime.current = true
     } finally {
       setIsLoading(false)
     }
@@ -171,6 +181,8 @@ export const ListsProvider = ({ children }: ProviderProps) => {
         current,
         isGetting,
         previewList,
+        changeListVisibility,
+        alreadyLoadListsFirstTime: alreadyLoadListsFirstTime.current,
       }}
     >
       {children}

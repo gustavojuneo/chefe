@@ -1,9 +1,8 @@
 'use client'
 
-import { Button } from '@/components/Button'
+import { Button as ButtonComponent } from '@/components/Button'
 import clsx from 'clsx'
 import { Share } from 'lucide-react'
-import { usePathname } from 'next/navigation'
 
 type ButtonProps = {
   listId: string
@@ -11,20 +10,19 @@ type ButtonProps = {
   circle?: boolean
   isLoading?: boolean
   disabled?: boolean
+  onShare: (listId: string) => void
 }
 
-export const ShareButton = ({
+export const Button = ({
   listId,
   circle = true,
   showLabel = false,
   isLoading = false,
   disabled = false,
+  onShare,
 }: ButtonProps) => {
-  const pathname = usePathname()
-
-  const handleShareList = (listId?: string) => {
-    const shareLink = `https://chefe.gustavojuneo.dev${pathname}/${listId}?usp=sharing`
-    navigator.clipboard.writeText(shareLink)
+  const handleShareList = (listId: string) => {
+    onShare(listId)
   }
 
   if (isLoading) {
@@ -44,7 +42,7 @@ export const ShareButton = ({
   }
 
   return (
-    <Button
+    <ButtonComponent
       circle={circle}
       className="bg-blue-400 hover:bg-blue-700"
       disabled={disabled}
@@ -52,6 +50,6 @@ export const ShareButton = ({
     >
       <Share size={18} />
       {showLabel ? 'Share' : null}
-    </Button>
+    </ButtonComponent>
   )
 }

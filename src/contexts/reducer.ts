@@ -62,6 +62,7 @@ export const reducer = (state: State, action: ListAction): State => {
         current = {
           ...current,
           ...formattedList,
+          restricted: list.restricted,
         }
       }
 

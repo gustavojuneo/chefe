@@ -16,7 +16,7 @@ export const Main = ({ children }: any) => {
     <SessionProvider>
       <ListsProvider>
         <main
-          className={`w-full h-full flex justify-center overflow-x-hidden overflow-y-auto mb-[${footerHeight}]`}
+          className={`w-full h-full flex justify-center overflow-x-hidden overflow-y-auto mb-[${footerHeight}] px-4`}
         >
           <div className="w-full max-w-[375px] h-full py-10">{children}</div>
         </main>

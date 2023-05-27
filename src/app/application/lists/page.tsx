@@ -7,13 +7,13 @@ import { useLists } from '@/hooks/useLists'
 import { useEffect } from 'react'
 
 export default function Lists() {
-  const { lists, loadLists, isLoading } = useLists()
+  const { lists, loadLists, isLoading, alreadyLoadListsFirstTime } = useLists()
 
   useEffect(() => {
-    if (lists.length === 0) {
+    if (lists.length === 0 || !alreadyLoadListsFirstTime) {
       loadLists()
     }
-  }, [lists.length, loadLists])
+  }, [lists.length, loadLists, alreadyLoadListsFirstTime])
 
   return (
     <div className="flex flex-col w-full h-full">
