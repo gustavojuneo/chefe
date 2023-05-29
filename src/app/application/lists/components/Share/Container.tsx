@@ -98,16 +98,14 @@ export const Container = ({
 
   return (
     <Dialog.Root visible={opened} onOpenChange={onOpenChange}>
-      <Dialog.Content>
+      <Dialog.Content
+        title={isGetting ? undefined : `Compartilhe "${current.name}"`}
+        hasClose={false}
+      >
         {isGetting ? (
           <Spinner />
         ) : (
           <>
-            <header className="flex items-center mb-4">
-              <h3 className="block flex-1 text-2xl font-semibold text-zinc-700 max-w-[90%] truncate">
-                Compartilhe {`"${current.name}"`}
-              </h3>
-            </header>
             <div className="flex flex-col gap-4 mb-10">
               <form
                 onSubmit={handleInviteMember}

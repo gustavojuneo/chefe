@@ -5,15 +5,11 @@ import { ReactNode } from 'react'
 
 interface DialogProps {
   children: ReactNode
-  title: string
+  title?: string
   hasClose?: boolean
 }
 
-export const Content = ({
-  children,
-  title = 'Compartilhando "filmes"',
-  hasClose = true,
-}: DialogProps) => {
+export const Content = ({ children, title, hasClose = true }: DialogProps) => {
   return (
     <Dialog.Portal>
       <Dialog.Overlay className="fixed inset-0 bg-black/20" />
@@ -26,14 +22,16 @@ export const Content = ({
         )}
       >
         {(!!title || hasClose) && (
-          <div className="flex justify-between items-center mb-4 gap-4">
-            <h2 className="w-full font-bold text-2xl truncate">{title}</h2>
+          <header className="flex justify-between items-center mb-4 gap-4">
+            {title && (
+              <h2 className="w-full font-bold text-2xl truncate">{title}</h2>
+            )}
             {hasClose && (
-              <Dialog.Close>
+              <Dialog.Close className="ml-auto">
                 <X size={24} />
               </Dialog.Close>
             )}
-          </div>
+          </header>
         )}
         {children}
       </Dialog.Content>
