@@ -4,6 +4,8 @@ import { RefObject, useRef } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { ListDTO } from '@/dtos/ListDTO'
 import { ListItemDTO } from '@/dtos/ListItemDTO'
+import { Input } from './Input'
+import { Button } from './Button'
 
 const getItensFromInput = (inputRef: RefObject<HTMLInputElement>) => {
   if (inputRef.current) {
@@ -81,13 +83,9 @@ export const CreateListForm = ({
     >
       <div>
         <label htmlFor="name" className="block mb-1">
-          List name
+          Nome da lista
         </label>
-        <input
-          id="name"
-          className="outline-none px-4 py-1 w-full rounded"
-          {...register('name')}
-        />
+        <Input id="name" {...register('name')} />
       </div>
 
       <div>
@@ -96,20 +94,15 @@ export const CreateListForm = ({
           control={control}
           render={({ field: { onChange, value } }) => (
             <>
-              <div className="flex w-full gap-2">
-                <input
-                  ref={listRef}
-                  id="list"
-                  placeholder="Novo item"
-                  className="w-full px-2 text-sm rounded"
-                />
-                <button
+              <div className="flex w-full gap-2 items-center">
+                <Input ref={listRef} id="list" placeholder="Novo item" />
+                <Button
                   type="button"
                   onClick={() => onAddList(value, onChange)}
-                  className="p-2 w-[40px] h-[40px] bg-green-500 rounded flex items-center justify-center"
+                  className="w-[40px] h-[40px] bg-green-500 hover:bg-green-600"
                 >
                   +
-                </button>
+                </Button>
               </div>
               <ul className="flex flex-col gap-1 h-[100px] overflow-auto mt-2">
                 {value?.map((item) => (

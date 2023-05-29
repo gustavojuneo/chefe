@@ -1,4 +1,5 @@
 import { Search } from 'lucide-react'
+import { Input } from './Input'
 
 type SearchInputProps = {
   isLoading?: boolean
@@ -22,18 +23,13 @@ export const SearchInput = ({
       </div>
     </div>
   ) : (
-    <div className="relative w-full">
-      <input
-        placeholder="Pesquisar"
-        value={value}
-        className="w-full border-2 border-zinc-200 p-2 pl-8 rounded outline-none focus:border-red-500 focus:placeholder:text-red-400 peer transition"
-        onChange={({ target }) => {
-          onChangeValue(target.value)
-        }}
-      />
-      <span className="absolute left-2 top-[50%] -translate-y-1/2 text-zinc-400 peer-focus:text-red-500 transition">
-        <Search size={18} />
-      </span>
-    </div>
+    <Input
+      placeholder="Procure por uma lista"
+      value={value}
+      onChange={({ target }) => {
+        onChangeValue(target.value)
+      }}
+      leftIcon={Search}
+    />
   )
 }
