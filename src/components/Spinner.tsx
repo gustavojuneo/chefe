@@ -1,17 +1,32 @@
+import clsx from 'clsx'
+import colors from 'tailwindcss/colors'
+
 type SpinnerProps = {
   size?: 12 | 16 | 18 | 24 | 32 | 64 | number
+  containerFullSize?: boolean
+  fill?: string
+  className?: string
 }
 
-export const Spinner = ({ size = 32 }: SpinnerProps) => {
+export const Spinner = ({
+  size = 32,
+  fill = colors.red[600],
+  containerFullSize = true,
+  className,
+}: SpinnerProps) => {
   return (
-    <div className="w-full h-full flex-1 flex items-center justify-center">
+    <div
+      className={clsx('flex items-center justify-center', className, {
+        'w-full h-full': containerFullSize,
+      })}
+    >
       <svg
         aria-hidden="true"
         width={size}
         height={size}
-        className="text-gray-200 animate-spin dark:text-gray-600 fill-red-600"
+        className={clsx('text-gray-200 animate-spin dark:text-gray-600')}
         viewBox="0 0 100 101"
-        fill="none"
+        fill={fill}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path

@@ -5,10 +5,12 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import colors from 'tailwindcss/colors'
 
 import { Button } from '@/components/Button'
 import { Input } from '@/components/Input'
 import { api } from '@/lib/axios'
+import { Spinner } from '@/components/Spinner'
 
 const updateProfileFormSchema = z.object({
   name: z
@@ -34,7 +36,7 @@ export const FormContainer = ({ user }: FormContainerProps) => {
   const {
     register,
     handleSubmit,
-    formState: { errors, isDirty },
+    formState: { errors, isDirty, isSubmitting },
   } = useForm<UpdateProfileFormData>({
     resolver: zodResolver(updateProfileFormSchema),
     defaultValues: {
@@ -93,10 +95,18 @@ export const FormContainer = ({ user }: FormContainerProps) => {
       />
       <Button
         type="submit"
-        className="bg-green-500 hover:bg-green-600 text-zinc-50"
-        disabled={!isDirty}
+        className="bg-green-500 hover:bg-green-600 text-zinc-50 relative"
+        disabled={!isDirty || isSubmitting}
       >
         Salvar alterações
+        {isSubmitting && (
+          <Spinner
+            size={20}
+            containerFullSize={false}
+            fill={colors.zinc[400]}
+            className="absolute right-2"
+          />
+        )}
       </Button>
     </form>
   )
