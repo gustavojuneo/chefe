@@ -2,21 +2,17 @@
 
 import { ListsProvider } from '@/contexts/ListsContext'
 import { SessionProvider } from 'next-auth/react'
-import { useEffect, useState } from 'react'
+import { useRef } from 'react'
 
 export const Main = ({ children }: any) => {
-  const [footerHeight, setFooterHeight] = useState(84)
-
-  useEffect(() => {
-    const footer = document.getElementById('root-footer')
-    setFooterHeight(footer?.clientHeight ?? 84)
-  }, [])
+  const mainRef = useRef<HTMLElement>(null)
 
   return (
     <SessionProvider>
       <ListsProvider>
         <main
-          className={`w-full h-full flex justify-center overflow-x-hidden overflow-y-auto mb-[${footerHeight}] px-4`}
+          ref={mainRef}
+          className="w-full h-full flex justify-center overflow-x-hidden overflow-y-auto px-4"
         >
           <div className="w-full max-w-[375px] h-full py-10">{children}</div>
         </main>

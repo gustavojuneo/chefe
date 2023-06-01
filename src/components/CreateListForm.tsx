@@ -81,12 +81,7 @@ export const CreateListForm = ({
         update ? handleSubmit(handleUpdateList) : handleSubmit(handleCreateList)
       }
     >
-      <div>
-        <label htmlFor="name" className="block mb-1">
-          Nome da lista
-        </label>
-        <Input id="name" {...register('name')} />
-      </div>
+      <Input id="name" label="Nome da lista" {...register('name')} />
 
       <div>
         <Controller

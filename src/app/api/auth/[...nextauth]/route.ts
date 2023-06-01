@@ -55,7 +55,11 @@ export const authOptions: AuthOptions = {
         },
       }
     },
-    jwt({ token, user }) {
+    jwt({ token, user, trigger, session }) {
+      if (trigger === 'update' && session?.name) {
+        token.name = session.name
+      }
+
       if (user) {
         const u = user as unknown as any
         return {
@@ -64,6 +68,7 @@ export const authOptions: AuthOptions = {
           randomKey: u.randomKey,
         }
       }
+
       return token
     },
   },

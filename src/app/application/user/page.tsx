@@ -2,8 +2,11 @@
 import { signOut, useSession } from 'next-auth/react'
 import { LogOut } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
-export default function Profile() {
+export default function User() {
+  const pathname = usePathname()
   const { data: session, status } = useSession()
   const isLoading = status === 'loading'
 
@@ -29,11 +32,28 @@ export default function Profile() {
                 height={100}
                 className="rounded-full"
               />
-              <h1 className="text-zinc-800 text-2xl">{session?.user?.name}</h1>
+              <h1 className="text-zinc-800 text-2xl font-semibold">
+                {session?.user?.name}
+              </h1>
             </div>
           )}
+          <nav className="flex flex-col items-center mt-10">
+            <ul className="flex flex-col items-center gap-2">
+              <li className="text-zinc-800 hover:text-zinc-600 transition font-medium">
+                <Link
+                  className="block p-2"
+                  href={`${pathname}/your-informations`}
+                >
+                  Suas informações
+                </Link>
+              </li>
+              <li className="p-2 cursor-not-allowed text-zinc-400 transition font-medium">
+                Configurações
+              </li>
+            </ul>
+          </nav>
           <button
-            className="mt-20 flex gap-2 items-center text-zinc-800"
+            className="mt-20 flex gap-2 items-center text-zinc-800 hover:bg-zinc-200 p-2 rounded transition"
             onClick={handleLogout}
           >
             <LogOut />
