@@ -1,19 +1,16 @@
 'use client'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ArrowLeft } from 'lucide-react'
 
 import { Itens } from './components/Itens'
-import { useRouter } from 'next/navigation'
 import { FormData } from '@/components/CreateListForm'
 import { CreateListModal } from '@/components/CreateListModal'
 import { DeleteButton } from '../components/DeleteButton'
 import { useLists } from '@/hooks/useLists'
-import { api } from '@/lib/axios'
-import { toast } from 'react-toastify'
-import { isAxiosError } from 'axios'
 import { ListDTO } from '@/dtos/ListDTO'
 import * as Share from '../components/Share'
 import Link from 'next/link'
+import { useSession } from 'next-auth/react'
 
 type ListItensProps = {
   params: {
@@ -25,6 +22,7 @@ type ListItensProps = {
 }
 
 export default function ListItens({ params, searchParams }: ListItensProps) {
+  const { data: session } = useSession()
   const {
     getCurrentList,
     current: list,
@@ -35,7 +33,6 @@ export default function ListItens({ params, searchParams }: ListItensProps) {
     lastChoosedItem,
     acceptInvite,
   } = useLists()
-  const router = useRouter()
   const [sharing, setSharing] = useState<{
     showModal: boolean
     listId: string | null
@@ -106,6 +103,7 @@ export default function ListItens({ params, searchParams }: ListItensProps) {
           circle={false}
           listId={list.id}
           showLabel
+          label={list.ownerId === session?.user.id ? 'Delete' : 'Sair'}
           isLoading={isLoadingList}
           inListPage
           disabled={previewList}

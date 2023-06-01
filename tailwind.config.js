@@ -17,6 +17,8 @@ module.exports = {
         slideDown: 'slideDown 300ms cubic-bezier(0.87, 0, 0.13, 1)',
         slideUp: 'slideUp 300ms cubic-bezier(0.87, 0, 0.13, 1)',
         slideUpAndFade: 'slideUpAndFade 400ms cubic-bezier(0.16, 1, 0.3, 1)',
+        slideBadgeUpAndFade: 'slideBadgeUpAndFade 400ms',
+        pingBadge: 'pingBadge 1s cubic-bezier(0, 0, 0.2, 1)',
       },
       keyframes: {
         slideDown: {
@@ -31,8 +33,18 @@ module.exports = {
           from: { opacity: 0, transform: 'translateY(2px)' },
           to: { opacity: 1, transform: 'translateY(0)' },
         },
+        slideBadgeUpAndFade: {
+          from: { opacity: 0, top: 2 },
+          to: { opacity: 1, top: 0 },
+        },
+        pingBadge: {
+          '75%,100%': {
+            transform: 'scale(1.5)',
+            opacity: 0,
+          },
+        },
       },
     },
   },
-  plugins: [require('tailwindcss-radix')()],
+  plugins: [require('tailwindcss-radix')(), '@tailwindcss/line-clamp'],
 }

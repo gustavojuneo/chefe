@@ -15,6 +15,7 @@ type InputProps = DetailedHTMLProps<
   leftIcon?: LucideIcon
   label?: string
   errorMessage?: string
+  showErrorMessage?: boolean
 }
 
 export const Input = forwardRef(
@@ -26,6 +27,7 @@ export const Input = forwardRef(
       name,
       disabled,
       errorMessage,
+      showErrorMessage = true,
       ...rest
     }: InputProps,
     ref: LegacyRef<HTMLInputElement> | undefined,
@@ -49,7 +51,7 @@ export const Input = forwardRef(
         </div>
       </div>
     ) : (
-      <div className="flex flex-col gap-1">
+      <div className="w-full flex flex-col gap-1">
         {!!label && (
           <label htmlFor={id} className="text-zinc-800">
             {label}
@@ -79,7 +81,9 @@ export const Input = forwardRef(
             {...rest}
           />
         </div>
-        <span className="h-[24px] text-red-500 block">{errorMessage}</span>
+        {showErrorMessage && (
+          <span className="h-[24px] text-red-500 block">{errorMessage}</span>
+        )}
       </div>
     )
   },

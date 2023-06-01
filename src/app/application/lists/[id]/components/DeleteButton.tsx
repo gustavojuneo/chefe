@@ -20,7 +20,7 @@ export const DeleteButton = ({
   return (
     <Button
       circle
-      className="bg-red-400 hover:bg-red-500"
+      className="bg-red-400 hover:bg-red-500 text-white"
       onClick={() => removeItemFromList(listId, itemId)}
     >
       <Trash size={18} />

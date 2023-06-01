@@ -8,6 +8,7 @@ import { Trash } from 'lucide-react'
 type ButtonProps = {
   listId: string
   showLabel?: boolean
+  label?: string
   circle?: boolean
   isLoading?: boolean
   inListPage?: boolean
@@ -16,6 +17,7 @@ type ButtonProps = {
 
 export const DeleteButton = ({
   listId,
+  label = 'Delete',
   circle = true,
   showLabel = false,
   isLoading = false,
@@ -43,12 +45,12 @@ export const DeleteButton = ({
   return (
     <Button
       circle={circle}
-      className="bg-red-400 hover:bg-red-500"
+      className="bg-red-400 hover:bg-red-500 text-white"
       disabled={disabled}
       onClick={() => removeList(listId, inListPage)}
     >
       <Trash size={18} />
-      {showLabel ? 'Delete' : null}
+      {showLabel && label}
     </Button>
   )
 }

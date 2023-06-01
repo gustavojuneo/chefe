@@ -44,7 +44,7 @@ export const Button = ({
   return (
     <ButtonComponent
       circle={circle}
-      className="bg-blue-400 hover:bg-blue-700"
+      className="bg-blue-400 hover:bg-blue-700 text-white"
       disabled={disabled}
       onClick={() => handleShareList(listId)}
     >

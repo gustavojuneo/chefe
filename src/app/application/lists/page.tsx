@@ -16,7 +16,7 @@ export default function Lists() {
   }, [lists.length, loadLists, alreadyLoadListsFirstTime])
 
   return (
-    <div className="flex flex-col w-full h-full">
+    <div className="flex flex-col w-full pb-10">
       <Header />
       <div className="flex w-full justify-center gap-2 mt-8">
         <CreateListModal isLoading={isLoading} />

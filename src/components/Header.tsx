@@ -1,19 +1,40 @@
 'use client'
-import { LogOut } from 'lucide-react'
-import { signOut, useSession } from 'next-auth/react'
+import { api } from '@/lib/axios'
+import { Bell } from 'lucide-react'
+import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useCallback, useEffect, useState } from 'react'
+import { NotificationsBadge } from './NotificationsBadge'
+
+type NotificationsDTO = {
+  _count: {
+    invitations: number
+  }
+}
 
 export const Header = () => {
   const session = useSession()
-
   const user = session?.data?.user
   const status = session?.status
   const isLoading = status === 'loading'
+  const [notificationsCount, setNotificationsCount] = useState(0)
 
-  const handleLogout = async () => {
-    await signOut()
-  }
+  const loadNotifications = useCallback(async () => {
+    const response = await api.get('/users/notifications/count')
+    const { data } = response
+    const notifications = data.notifications as NotificationsDTO
+    const count = Object.values(notifications._count).reduce(
+      (acc, currentValue) => {
+        return acc + currentValue
+      },
+    )
+    setNotificationsCount(count)
+  }, [])
+
+  useEffect(() => {
+    loadNotifications()
+  }, [loadNotifications])
 
   return (
     <header className="flex justify-between items-center">
@@ -49,13 +70,16 @@ export const Header = () => {
           </>
         )}
       </div>
-      <button
+      <Link
+        href="/application/notifications"
         className="flex gap-2 items-center text-zinc-800 disabled:opacity-40"
-        onClick={handleLogout}
-        disabled={isLoading || status === 'unauthenticated'}
       >
-        <LogOut />
-      </button>
+        <NotificationsBadge
+          quantity={notificationsCount}
+          bgColor="bg-red-500"
+          className="text-white"
+        />
+      </Link>
     </header>
   )
 }

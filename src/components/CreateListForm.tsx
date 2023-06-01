@@ -81,7 +81,12 @@ export const CreateListForm = ({
         update ? handleSubmit(handleUpdateList) : handleSubmit(handleCreateList)
       }
     >
-      <Input id="name" label="Nome da lista" {...register('name')} />
+      <Input
+        id="name"
+        label="Nome da lista"
+        showErrorMessage={false}
+        {...register('name')}
+      />
 
       <div>
         <Controller
@@ -89,12 +94,17 @@ export const CreateListForm = ({
           control={control}
           render={({ field: { onChange, value } }) => (
             <>
-              <div className="flex w-full gap-2 items-center">
-                <Input ref={listRef} id="list" placeholder="Novo item" />
+              <div className="flex w-full gap-2">
+                <Input
+                  ref={listRef}
+                  id="list"
+                  placeholder="Novo item"
+                  showErrorMessage={false}
+                />
                 <Button
                   type="button"
                   onClick={() => onAddList(value, onChange)}
-                  className="w-[40px] h-[40px] bg-green-500 hover:bg-green-600"
+                  className="w-[44px] h-[44px] bg-green-500 hover:bg-green-600 text-white border-transparent"
                 >
                   +
                 </Button>
