@@ -57,7 +57,7 @@ export const Input = forwardRef(
         )}
         <div id={id} className="relative w-full">
           {Icon && (
-            <span className="absolute left-2 top-[50%] -translate-y-1/2 text-zinc-400 peer-focus:text-red-500 transition">
+            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-zinc-400 peer-focus:text-red-500 transition">
               <Icon size={18} />
             </span>
           )}
@@ -78,8 +78,8 @@ export const Input = forwardRef(
             name={name}
             {...rest}
           />
-          <span className="h-[24px] text-red-500 block">{errorMessage}</span>
         </div>
+        <span className="h-[24px] text-red-500 block">{errorMessage}</span>
       </div>
     )
   },
